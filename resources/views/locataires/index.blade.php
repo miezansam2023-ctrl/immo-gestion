@@ -5,7 +5,7 @@
 @section('content')
     <div class="max-w-7xl mx-auto px-4 py-10" x-data="{ openModal: {{ $errors->any() ? 'true' : 'false' }} }">
 
-        @if (session('success'))
+        {{-- @if (session('success'))
             <div x-data="{ show: true }" x-show="show"
                 class="relative mb-8 flex items-center p-4 bg-emerald-50 border-l-4 border-emerald-500 rounded-r-2xl shadow-sm">
                 <div class="flex-shrink-0 bg-emerald-500 rounded-full p-1">
@@ -24,9 +24,9 @@
                         </path>
                     </svg></button>
             </div>
-        @endif
+        @endif --}}
 
-        @if ($errors->any())
+        {{-- @if ($errors->any())
             <div class="bg-red-100 text-red-700 p-4 rounded-2xl mb-4">
                 <ul class="list-disc pl-5">
                     @foreach ($errors->all() as $error)
@@ -34,7 +34,7 @@
                     @endforeach
                 </ul>
             </div>
-        @endif
+        @endif --}}
 
         <div class="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>

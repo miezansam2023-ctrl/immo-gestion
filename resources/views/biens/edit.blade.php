@@ -29,7 +29,7 @@
     </div>
 
     {{-- ALERTES --}}
-    @if(session('success'))
+    {{-- @if(session('success'))
     <div class="bg-emerald-50 border-l-4 border-emerald-500 p-4 rounded-r-2xl shadow-sm flex justify-between items-center">
         <div class="flex items-center">
             <i class="fas fa-check-circle text-emerald-500 mr-3"></i>
@@ -37,7 +37,7 @@
         </div>
         <button onclick="this.parentElement.remove()" class="text-emerald-400 hover:text-emerald-600"><i class="fas fa-times"></i></button>
     </div>
-    @endif
+    @endif --}}
 
     <form action="{{ route('biens.update', $bien->id) }}" method="POST" enctype="multipart/form-data">
         @csrf

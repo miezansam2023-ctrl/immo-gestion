@@ -4,35 +4,6 @@
 
 @section('content')
 <div class="max-w-6xl mx-auto px-4 py-8 space-y-8">
-    @if(session('success'))
-    <div x-data="{ show: true }"
-        x-show="show"
-        x-transition:leave="transition ease-in duration-300"
-        x-transition:leave-start="opacity-100 scale-100"
-        x-transition:leave-end="opacity-0 scale-90"
-        class="relative mb-6 flex items-center p-4 bg-emerald-50 border-l-4 border-emerald-500 rounded-r-2xl shadow-sm tracking-wide">
-
-        <div class="flex-shrink-0 bg-emerald-500 rounded-full p-1">
-            <svg class="h-4 w-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
-            </svg>
-        </div>
-
-        <div class="ml-4">
-            <h3 class="text-xs font-black text-emerald-900 uppercase tracking-widest">Opération réussie</h3>
-            <p class="text-[11px] font-bold text-emerald-700 mt-0.5">
-                {{ session('success') }}
-            </p>
-        </div>
-
-        <button @click="show = false" class="ml-auto group p-2">
-            <svg class="h-5 w-5 text-emerald-300 group-hover:text-emerald-600 transition-colors"
-                fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-            </svg>
-        </button>
-    </div>
-    @endif
 
     {{-- BARRE DE NAVIGATION ET ACTIONS --}}
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -260,8 +231,6 @@
             <div class="flex items-center justify-between px-10 py-6 bg-gray-50 rounded-[2rem] border border-gray-100">
                 <div class="flex gap-8">
                     <div>
-                        <!-- <span class="block text-[8px] font-black text-gray-400 uppercase">Fiabilité</span>
-                        <span class="text-[10px] font-bold text-emerald-500 flex items-center"><i class="fas fa-star mr-1"></i> Excellente</span> -->
                         {{-- SECTION DOCUMENTS --}}
                         <div class="bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-sm">
                             <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-6 flex items-center justify-between">

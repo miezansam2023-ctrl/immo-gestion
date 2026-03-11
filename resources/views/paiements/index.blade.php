@@ -4,17 +4,8 @@
 
 @section('content')
 <div class="max-w-7xl mx-auto pb-12 space-y-8 px-4 py-8 italic">
-    @if ($errors->any())
-    <div class="max-w-7xl mx-auto mt-4 p-4 bg-red-100 border-l-4 border-red-500 text-red-700">
-        <p class="font-bold">Oups ! Il y a des erreurs :</p>
-        <ul class="list-disc ml-5">
-            @foreach ($errors->all() as $error)
-            <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-    @endif
-    @if(session('success'))
+    
+    {{-- @if(session('success'))
     <div x-data="{ show: true }" x-show="show" class="relative mb-8 flex items-center p-4 bg-emerald-50 border-l-4 border-emerald-500 rounded-r-2xl shadow-sm">
         <div class="flex-shrink-0 bg-emerald-500 rounded-full p-1">
             <svg class="h-4 w-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -29,7 +20,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg></button>
     </div>
-    @endif
+    @endif --}}
 
     {{-- 1. EN-TÊTE & ACTION --}}
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">

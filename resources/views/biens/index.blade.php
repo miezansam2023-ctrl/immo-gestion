@@ -60,7 +60,7 @@
     </div>
 
     {{-- Alertes de Succès --}}
-    @if(session('success'))
+    {{-- @if(session('success'))
     <div x-data="{ show: true }" x-show="show" class="mb-6 flex items-center p-4 bg-emerald-50 border-l-4 border-emerald-500 rounded-r-2xl shadow-sm">
         <div class="ml-4">
             <p class="text-[11px] font-bold text-emerald-700 uppercase">{{ session('success') }}</p>
@@ -69,7 +69,7 @@
             <i class="fas fa-times"></i>
         </button>
     </div>
-    @endif
+    @endif --}}
 
     {{-- DATA TABLE (La Vue Principale) --}}
     <div class="bg-white rounded-[3rem] shadow-sm border border-gray-100 overflow-hidden">

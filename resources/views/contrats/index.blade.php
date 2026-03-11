@@ -58,7 +58,7 @@
         </div>
 
         {{-- 2. ALERTES DYNAMIQUES --}}
-        @if (session('success'))
+        {{-- @if (session('success'))
             <div id="alert-success"
                 class="flex items-center justify-between bg-emerald-50 border-l-4 border-emerald-500 p-4 rounded-2xl shadow-sm">
                 <div class="flex items-center">
@@ -69,7 +69,7 @@
                 <button onclick="this.parentElement.remove()"
                     class="text-emerald-500 hover:rotate-90 transition-transform"><i class="fas fa-times"></i></button>
             </div>
-        @endif
+        @endif --}}
 
         {{-- 3. REGISTRE DES CONTRATS (TABLEAU PRINCIPAL) --}}
         <div class="bg-white rounded-[3rem] shadow-sm border border-gray-100 overflow-hidden">
@@ -186,7 +186,7 @@
                                 </td>
                             </tr>
                         @empty
-                            {{-- ... le tr empty reste identique ... --}}
+                            
                         @endforelse
                     </tbody>
                 </table>
