@@ -28,7 +28,8 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false))->with('success', "Bienvenue, vous etes connecté(e) !");;
+        // return redirect()->intended(route('dashboard', absolute: false))->with('success', "Bienvenue , vous etes connecté(e) !");
+        return redirect()->intended(route('dashboard', absolute: false))->with('success', 'Bienvenue, '. Auth::user()->role . ' ' . Auth::user()->nom . ' ' . Auth::user()->prenoms . '. Vous etes connecté(e)  !');
     }
 
     /**
