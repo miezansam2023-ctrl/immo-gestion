@@ -12,7 +12,7 @@
 
 <body class="bg-gray-100 font-sans">
     <div class="min-h-screen">
-        <nav class="bg-white border-b border-gray-200">
+        {{-- <nav class="bg-white border-b border-gray-200">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between h-16">
                     <div class="flex items-center">
@@ -77,6 +77,112 @@
                     </div>
                 </div>
             </div>
+        </nav> --}}
+        <nav class="bg-white border-b border-gray-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-16">
+
+                    {{-- Logo --}}
+                    <span class="text-xl font-black uppercase tracking-tighter text-indigo-600">
+                        Immo<span class="text-slate-900">Gestion</span>
+                    </span>
+
+                    {{-- Menu desktop --}}
+                    <div class="hidden lg:flex items-center space-x-8">
+                        <a href="{{ route('dashboard') }}"
+                            class="text-sm font-medium {{ request()->routeIs('dashboard') ? 'text-indigo-600' : 'text-gray-500 hover:text-indigo-600' }}">
+                            <i class="fas fa-chart-line mr-1"></i> Dashboard
+                        </a>
+                        <a href="{{ route('biens.index') }}"
+                            class="text-sm font-medium {{ request()->routeIs('biens.*') ? 'text-indigo-600' : 'text-gray-500 hover:text-indigo-600' }}">
+                            <i class="fas fa-building mr-1"></i> Mes Biens
+                        </a>
+                        <a href="{{ route('locataires.index') }}"
+                            class="text-sm font-medium {{ request()->routeIs('locataires.*') ? 'text-indigo-600' : 'text-gray-500 hover:text-indigo-600' }}">
+                            <i class="fas fa-users mr-1"></i> Locataires
+                        </a>
+                        <a href="{{ route('contrats.index') }}"
+                            class="text-sm font-medium {{ request()->routeIs('contrats.*') ? 'text-indigo-600' : 'text-gray-500 hover:text-indigo-600' }}">
+                            <i class="fas fa-file-contract mr-1"></i> Contrats
+                        </a>
+                        <a href="{{ route('paiements.index') }}"
+                            class="text-sm font-medium {{ request()->routeIs('paiements.*') ? 'text-indigo-600' : 'text-gray-500 hover:text-indigo-600' }}">
+                            <i class="fas fa-hand-holding-usd mr-1"></i> Loyers
+                        </a>
+                        <a href="{{ route('settings.index') }}"
+                            class="text-sm font-medium {{ request()->routeIs('settings.*') ? 'text-indigo-600' : 'text-gray-500 hover:text-indigo-600' }}">
+                            <i class="fas fa-cog mr-1"></i> Paramètres
+                        </a>
+                    </div>
+
+                    {{-- Droite : avatar + hamburger --}}
+                    <div class="flex items-center space-x-3">
+                        {{-- Avatar (toujours visible) --}}
+                        <div class="hidden sm:block text-right">
+                            <p class="text-sm font-bold text-gray-800">{{ Auth::user()->prenoms }}
+                                {{ Auth::user()->nom }}</p>
+                            <p class="text-xs text-indigo-500 font-medium capitalize">{{ Auth::user()->role }}</p>
+                        </div>
+                        <div
+                            class="h-9 w-9 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold border border-indigo-200 text-sm">
+                            {{ substr(Auth::user()->prenoms, 0, 1) }}{{ substr(Auth::user()->nom, 0, 1) }}
+                        </div>
+
+                        {{-- Bouton logout desktop --}}
+                        <form method="POST" action="{{ route('logout') }}" class="hidden lg:block">
+                            @csrf
+                            <button type="submit" class="text-gray-400 hover:text-red-500 transition">
+                                <i class="fas fa-sign-out-alt"></i>
+                            </button>
+                        </form>
+
+                        {{-- Bouton hamburger mobile --}}
+                        <button id="hamburger"
+                            class="lg:hidden p-2 rounded-md text-gray-500 hover:bg-gray-100 transition"
+                            onclick="toggleMenu()">
+                            <i class="fas fa-bars text-lg"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Menu mobile --}}
+            <div id="mobile-menu" class="lg:hidden hidden border-t border-gray-200 bg-white">
+                <div class="px-4 py-2 space-y-1">
+                    <a href="{{ route('dashboard') }}"
+                        class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium {{ request()->routeIs('dashboard') ? 'bg-indigo-50 text-indigo-600' : 'text-gray-600 hover:bg-gray-50' }}">
+                        <i class="fas fa-chart-line w-4"></i> Dashboard
+                    </a>
+                    <a href="{{ route('biens.index') }}"
+                        class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium {{ request()->routeIs('biens.*') ? 'bg-indigo-50 text-indigo-600' : 'text-gray-600 hover:bg-gray-50' }}">
+                        <i class="fas fa-building w-4"></i> Mes Biens
+                    </a>
+                    <a href="{{ route('locataires.index') }}"
+                        class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium {{ request()->routeIs('locataires.*') ? 'bg-indigo-50 text-indigo-600' : 'text-gray-600 hover:bg-gray-50' }}">
+                        <i class="fas fa-users w-4"></i> Locataires
+                    </a>
+                    <a href="{{ route('contrats.index') }}"
+                        class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium {{ request()->routeIs('contrats.*') ? 'bg-indigo-50 text-indigo-600' : 'text-gray-600 hover:bg-gray-50' }}">
+                        <i class="fas fa-file-contract w-4"></i> Contrats
+                    </a>
+                    <a href="{{ route('paiements.index') }}"
+                        class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium {{ request()->routeIs('paiements.*') ? 'bg-indigo-50 text-indigo-600' : 'text-gray-600 hover:bg-gray-50' }}">
+                        <i class="fas fa-hand-holding-usd w-4"></i> Loyers
+                    </a>
+                    <a href="{{ route('settings.index') }}"
+                        class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium {{ request()->routeIs('settings.*') ? 'bg-indigo-50 text-indigo-600' : 'text-gray-600 hover:bg-gray-50' }}">
+                        <i class="fas fa-cog w-4"></i> Paramètres
+                    </a>
+                    {{-- Logout mobile --}}
+                    <form method="POST" action="{{ route('logout') }}" class="pt-1 border-t border-gray-100">
+                        @csrf
+                        <button type="submit"
+                            class="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-medium text-red-500 hover:bg-red-50">
+                            <i class="fas fa-sign-out-alt w-4"></i> Se déconnecter
+                        </button>
+                    </form>
+                </div>
+            </div>
         </nav>
 
         <main class="py-10">
@@ -130,6 +236,14 @@
 
                 @yield('content')
             </div>
+
+            <script>
+                function toggleMenu() {
+                    const menu = document.getElementById('mobile-menu');
+                    menu.classList.toggle('hidden');
+                }
+            </script>
+            
         </main>
     </div>
 </body>
