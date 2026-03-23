@@ -47,8 +47,11 @@ class RegisteredUserController extends Controller
         ]);
 
         event(new Registered($user));
-        Auth::login($user);
+        
+        #Auth::login($user);
 
-        return redirect(route('dashboard', absolute: false));
+        #return redirect(route('dashboard', absolute: false));
+
+        return redirect()->route('login')->with('success', 'Bienvenue, ' . $user->role . ' ' . $user->nom . ' ' . $user->prenoms . '. Votre compte a été créé avec succès !');
     }
 }
