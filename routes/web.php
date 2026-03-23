@@ -19,7 +19,6 @@ Route::get('/', function () {
 // Toutes les routes protégées par l'authentification
 Route::middleware(['auth', 'verified'])->group(function () {
 
-
     // Le Dashboard utilise maintenant le Controller pour envoyer les stats à la vue
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
@@ -36,9 +35,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::get('/contrats', [ContratController::class, 'index'])->name('contrats.index');
-    Route::get('/contrats/nouveau', [ContratController::class, 'create'])->name('contrats.create');
+    #Route::get('/contrats/nouveau', [ContratController::class, 'create'])->name('contrats.create');
     Route::post('/contrats', [ContratController::class, 'store'])->name('contrats.store');
-
     Route::get('/contrats/{contrat}/pdf', [App\Http\Controllers\ContratController::class, 'generatePDF'])->name('contrats.pdf');
 
     // Paiement
