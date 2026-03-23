@@ -117,31 +117,33 @@
 
                     {{-- Droite : avatar + hamburger --}}
                     <div class="flex items-center space-x-3">
-                        {{-- Avatar (toujours visible) --}}
-                        <div class="hidden sm:block text-right">
-                            <p class="text-sm font-bold text-gray-800">{{ Auth::user()->prenoms }}
-                                {{ Auth::user()->nom }}</p>
-                            <p class="text-xs text-indigo-500 font-medium capitalize">{{ Auth::user()->role }}</p>
-                        </div>
-                        <div
-                            class="h-9 w-9 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold border border-indigo-200 text-sm">
-                            {{ substr(Auth::user()->prenoms, 0, 1) }}{{ substr(Auth::user()->nom, 0, 1) }}
-                        </div>
+                        @auth
+                            {{-- Avatar (toujours visible) --}}
+                            <div class="hidden sm:block text-right">
+                                <p class="text-sm font-bold text-gray-800">{{ Auth::user()->prenoms }}
+                                    {{ Auth::user()->nom }}</p>
+                                <p class="text-xs text-indigo-500 font-medium capitalize">{{ Auth::user()->role }}</p>
+                            </div>
+                            <div
+                                class="h-9 w-9 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold border border-indigo-200 text-sm">
+                                {{ substr(Auth::user()->prenoms, 0, 1) }}{{ substr(Auth::user()->nom, 0, 1) }}
+                            </div>
 
-                        {{-- Bouton logout desktop --}}
-                        <form method="POST" action="{{ route('logout') }}" class="hidden lg:block">
-                            @csrf
-                            <button type="submit" class="text-gray-400 hover:text-red-500 transition">
-                                <i class="fas fa-sign-out-alt"></i>
+                            {{-- Bouton logout desktop --}}
+                            <form method="POST" action="{{ route('logout') }}" class="hidden lg:block">
+                                @csrf
+                                <button type="submit" class="text-gray-400 hover:text-red-500 transition">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                </button>
+                            </form>
+
+                            {{-- Bouton hamburger mobile --}}
+                            <button id="hamburger"
+                                class="lg:hidden p-2 rounded-md text-gray-500 hover:bg-gray-100 transition"
+                                onclick="toggleMenu()">
+                                <i class="fas fa-bars text-lg"></i>
                             </button>
-                        </form>
-
-                        {{-- Bouton hamburger mobile --}}
-                        <button id="hamburger"
-                            class="lg:hidden p-2 rounded-md text-gray-500 hover:bg-gray-100 transition"
-                            onclick="toggleMenu()">
-                            <i class="fas fa-bars text-lg"></i>
-                        </button>
+                        @endauth
                     </div>
                 </div>
             </div>
@@ -187,6 +189,7 @@
 
         <main class="py-10">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                
                 {{-- Alertes de Succès --}}
                 {{-- @if (session('success'))
                     <div x-data="{ show: true }" x-show="show"
@@ -243,7 +246,7 @@
                     menu.classList.toggle('hidden');
                 }
             </script>
-            
+
         </main>
     </div>
 </body>
