@@ -5,37 +5,6 @@
 @section('content')
     <div class="max-w-7xl mx-auto px-4 py-10" x-data="{ openModal: {{ $errors->any() ? 'true' : 'false' }} }">
 
-        {{-- @if (session('success'))
-            <div x-data="{ show: true }" x-show="show"
-                class="relative mb-8 flex items-center p-4 bg-emerald-50 border-l-4 border-emerald-500 rounded-r-2xl shadow-sm">
-                <div class="flex-shrink-0 bg-emerald-500 rounded-full p-1">
-                    <svg class="h-4 w-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
-                    </svg>
-                </div>
-                <div class="ml-4">
-                    <h3 class="text-xs font-black text-emerald-900 uppercase tracking-widest">Opération réussie</h3>
-                    <p class="text-[11px] font-bold text-emerald-700 mt-0.5">{{ session('success') }}</p>
-                </div>
-                <button @click="show = false" class="ml-auto p-2 group"><svg
-                        class="h-5 w-5 text-emerald-300 group-hover:text-emerald-600 transition-colors" fill="none"
-                        stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
-                        </path>
-                    </svg></button>
-            </div>
-        @endif --}}
-
-        {{-- @if ($errors->any())
-            <div class="bg-red-100 text-red-700 p-4 rounded-2xl mb-4">
-                <ul class="list-disc pl-5">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif --}}
-
         <div class="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
                 <h1 class="text-3xl font-black text-gray-900 uppercase tracking-tighter">Locataires</h1>
@@ -81,10 +50,12 @@
                     @endif
                 @endif
             </form>
+
             <button @click="openModal = true"
                 class="px-8 py-4 bg-emerald-500 text-white rounded-2xl font-black text-[11px] uppercase tracking-widest hover:bg-emerald-600 hover:-translate-y-1 transition-all shadow-lg shadow-emerald-100 flex items-center">
                 <i class="fas fa-plus-circle mr-2 text-lg"></i> Nouveau Dossier
             </button>
+
         </div>
 
         {{-- Liste des Locataires (Tableau de ta capture) --}}
@@ -153,7 +124,7 @@
         </div>
 
         <div x-show="openModal" class="fixed inset-0 z-50 overflow-y-auto" x-cloak>
-            <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="flex items-start justify-center min-h-screen p-4 py-8">
                 <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm" @click="openModal = false"></div>
 
                 <div class="relative bg-gray-50 w-full max-w-6xl rounded-[3.5rem] shadow-2xl overflow-hidden"
@@ -163,18 +134,24 @@
                     <form action="{{ route('locataires.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
 
-                        <div class="flex justify-between items-center mb-10">
-                            <h2 class="text-3xl font-black text-gray-900 uppercase italic tracking-tighter">Création Dossier
-                                Locataire</h2>
+                        {{-- HEADER FIXE --}}
+                        <div class="bg-white px-10 py-6 border-b border-gray-100 flex justify-between items-center">
+                            <div>
+                                <h2 class="text-2xl font-black text-gray-900 uppercase tracking-tighter">Création Dossier
+                                    Locataire</h2>
+                                <p class="text-emerald-600 font-bold uppercase text-[9px] tracking-widest">Veuillez remplir
+                                    tous les champs obligatoires</p>
+                            </div>
                             <button type="button" @click="openModal = false"
                                 class="w-12 h-12 flex items-center justify-center rounded-full bg-white text-gray-400 hover:text-red-500 shadow-sm transition-colors">
                                 <i class="fas fa-times"></i>
                             </button>
                         </div>
 
-                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                        {{-- CONTENU SCROLLABLE --}}
+                        <div class="p-10 grid grid-cols-1 lg:grid-cols-12 gap-8">
+                            {{-- COLONNE GAUCHE --}}
                             <div class="lg:col-span-8 space-y-8">
-
                                 <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100">
                                     <h3
                                         class="text-xs font-black text-emerald-600 uppercase tracking-widest mb-8 flex items-center">
@@ -203,8 +180,7 @@
                                                 required>
                                         </div>
                                         <div class="md:col-span-2">
-                                            <label
-                                                class="block text-[10px] font-black text-gray-400 uppercase mb-2">Prénoms
+                                            <label class="block text-[10px] font-black text-gray-400 uppercase mb-2">Prénoms
                                                 *</label>
                                             <input type="text" name="prenoms"
                                                 class="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl font-bold"
@@ -330,8 +306,8 @@
                                 </div>
                             </div>
 
+                            {{-- COLONNE DROITE --}}
                             <div class="lg:col-span-4 space-y-8">
-
                                 <div class="bg-gray-900 p-8 rounded-[3rem] shadow-2xl text-white">
                                     <div class="flex justify-center mb-6">
                                         <div class="relative group" x-data="{ photoPreview: null }">

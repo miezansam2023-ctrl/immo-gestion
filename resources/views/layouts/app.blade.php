@@ -189,7 +189,7 @@
 
         <main class="py-10">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                
+
                 {{-- Alertes de Succès --}}
                 {{-- @if (session('success'))
                     <div x-data="{ show: true }" x-show="show"
@@ -249,6 +249,24 @@
 
         </main>
     </div>
+
+    <footer>
+        <div class="bg-gray-800 py-12">
+            <div class="container mx-auto px-6 text-center text-white">
+                <p class="text-sm mb-4">© 2026 ImmoGestion. Tous droits réservés.</p>
+                <div class="space-x-4">
+                    <a href="#" class="text-gray-400 hover:text-gray-200 transition">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-gray-200 transition">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-gray-200 transition">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                </div>
+    </footer>
+    
 </body>
 
 </html>

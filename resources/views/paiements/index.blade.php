@@ -5,23 +5,6 @@
 @section('content')
 <div class="max-w-7xl mx-auto pb-12 space-y-8 px-4 py-8 italic">
     
-    {{-- @if(session('success'))
-    <div x-data="{ show: true }" x-show="show" class="relative mb-8 flex items-center p-4 bg-emerald-50 border-l-4 border-emerald-500 rounded-r-2xl shadow-sm">
-        <div class="flex-shrink-0 bg-emerald-500 rounded-full p-1">
-            <svg class="h-4 w-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
-            </svg>
-        </div>
-        <div class="ml-4">
-            <h3 class="text-xs font-black text-emerald-900 uppercase tracking-widest">Opération réussie</h3>
-            <p class="text-[11px] font-bold text-emerald-700 mt-0.5">{{ session('success') }}</p>
-        </div>
-        <button @click="show = false" class="ml-auto p-2 group"><svg class="h-5 w-5 text-emerald-300 group-hover:text-emerald-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-            </svg></button>
-    </div>
-    @endif --}}
-
     {{-- 1. EN-TÊTE & ACTION --}}
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>

@@ -48,6 +48,7 @@
                         <p class="font-bold text-gray-800">{{ $paiement->bien->titre }}</p>
                         <p class="text-sm text-gray-500">{{ $paiement->bien->adresse }}</p>
                     </div>
+                    
                 </div>
 
                 {{-- Infos Financières --}}
