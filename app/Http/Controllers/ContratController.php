@@ -85,7 +85,7 @@ class ContratController extends Controller
      */
     public function show(Contrat $contrat)
     {
-        $contrat->load(['bien', 'locataire']);
+        $contrat->load(['bien', 'locataire', 'paiements']);
         return view('contrats.show', compact('contrat'));
     }
 

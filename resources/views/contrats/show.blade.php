@@ -30,8 +30,8 @@
                         ● Contrat {{ $contrat->statut }}
                     </span>
                     <!-- <button class="bg-[#1E293B] text-white px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-indigo-600 transition-all shadow-xl shadow-indigo-900/10">
-                                    Générer PDF
-                                </button> -->
+                                                Générer PDF
+                                            </button> -->
                 </div>
             </div>
 
@@ -117,72 +117,71 @@
                 <div class="lg:col-span-2 space-y-8">
 
                     {{-- INFOS FINANCIÈRES --}}
-                    <div class="bg-white rounded-[2.5rem] p-10 border border-gray-100 shadow-sm">
-                        <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-10">Conditions du Bail
-                        </h3>
+                    {{-- Les 4 métriques --}}
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                        <div class="relative pl-4">
+                            <div class="absolute left-0 top-0 w-1 h-full bg-indigo-500 rounded-full"></div>
+                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Loyer Mensuel</p>
+                            <p class="text-xl font-black text-indigo-600 italic">
+                                {{ number_format($contrat->loyer_mensuel, 0, ',', ' ') }}</p>
+                            <span class="text-[10px] font-black text-indigo-400 uppercase">FCFA</span>
+                        </div>
+                        <div class="relative pl-4">
+                            <div class="absolute left-0 top-0 w-1 h-full bg-gray-200 rounded-full"></div>
+                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Caution Versée
+                            </p>
+                            <p class="text-xl font-black text-[#1E293B] italic">
+                                {{ number_format($contrat->caution, 0, ',', ' ') }}</p>
+                            <span class="text-[10px] font-black text-gray-400 uppercase">FCFA</span>
+                        </div>
+                        <div class="relative pl-4">
+                            <div class="absolute left-0 top-0 w-1 h-full bg-gray-200 rounded-full"></div>
+                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Durée</p>
+                            <p class="text-xl font-black text-[#1E293B] italic">{{ $contrat->duree_mois ?? '0' }}</p>
+                            <span class="text-[10px] font-black text-gray-400 uppercase">Mois</span>
+                        </div>
+                        <div class="relative pl-4">
+                            <div class="absolute left-0 top-0 w-1 h-full bg-gray-200 rounded-full"></div>
+                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Jour de Paiement
+                            </p>
+                            <p class="text-xl font-black text-[#1E293B] italic">{{ $contrat->jour_paiement }}</p>
+                            <span class="text-[10px] font-black text-gray-400 uppercase">Du mois</span>
+                        </div>
+                    </div> *
+                    
+                    {{-- Période d'occupation — EN DEHORS du grid --}}
+                    @php
+                        $dateDebut = \Carbon\Carbon::parse($contrat->date_debut);
+                        $dateFin = \Carbon\Carbon::parse($contrat->date_fin);
+                        $totalJours = $dateDebut->diffInDays($dateFin);
+                        $joursEcoules = $dateDebut->diffInDays(now());
+                        $pourcentage = $totalJours > 0 ? min(100, max(0, ($joursEcoules / $totalJours) * 100)) : 0;
+                    @endphp
 
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                            <div class="relative">
-                                <p class="text-[10px] font-black text-gray-400 uppercase mb-2">Loyer Mensuel</p>
-                                <p class="text-3xl font-black text-indigo-600 italic">
-                                    {{ number_format($contrat->loyer_mensuel, 0, ',', ' ') }} <span
-                                        class="text-xs uppercase">CFA</span></p>
-                                <div class="absolute -left-4 top-0 w-1 h-12 bg-indigo-500 rounded-full"></div>
-                            </div>
+                    <div class="mt-6 p-6 bg-gray-50 rounded-[2rem] border border-gray-100">
+                        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-4">
                             <div>
-                                <p class="text-[10px] font-black text-gray-400 uppercase mb-2">Caution Versée</p>
-                                <p class="text-3xl font-black text-[#1E293B] italic">
-                                    {{ number_format($contrat->caution, 0, ',', ' ') }} <span
-                                        class="text-xs uppercase font-bold">CFA</span></p>
-                            </div>
-                            <div>
-                                <p class="text-[10px] font-black text-gray-400 uppercase mb-2">Durée</p>
-                                {{-- On affiche la durée venant du contrat, ou 0 si elle est vide --}}
-                                <p class="text-3xl font-black text-[#1E293B] italic">
-                                    {{ $contrat->duree_mois ?? '0' }}
-                                    <span class="text-xs uppercase font-bold text-gray-400">Mois</span>
+                                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Période
+                                    d'occupation</p>
+                                <p class="text-sm font-black text-[#1E293B]">
+                                    Du {{ $dateDebut->format('d/m/Y') }} au {{ $dateFin->format('d/m/Y') }}
                                 </p>
                             </div>
+                            <div class="flex items-center gap-2">
+                                <span
+                                    class="text-2xl font-black text-indigo-600 italic">{{ number_format($pourcentage, 0) }}%</span>
+                                <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">occupé</span>
+                            </div>
                         </div>
-
-                        <div class="mt-12 p-8 bg-gray-50 rounded-[2rem] border border-gray-100">
-                            <div class="flex justify-between items-end mb-4">
-                                <div>
-                                    <p class="text-[10px] font-black text-gray-400 uppercase mb-1">Période d'occupation</p>
-                                    <p class="font-black text-[#1E293B]">Du
-                                        {{ \Carbon\Carbon::parse($contrat->date_debut)->format('d/m/Y') }} au
-                                        {{ \Carbon\Carbon::parse($contrat->date_fin)->format('d/m/Y') }}</p>
-                                </div>
-
-                                <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">
-
-                                    @php
-                                        $dateDebut = \Carbon\Carbon::parse($contrat->date_debut);
-                                        $dateFin = \Carbon\Carbon::parse($contrat->date_fin);
-                                        $totalJours = $dateDebut->diffInDays($dateFin);
-                                        $joursEcoules = $dateDebut->diffInDays(now());
-                                        $pourcentage =
-                                            $totalJours > 0 ? min(100, max(0, ($joursEcoules / $totalJours) * 100)) : 0;
-                                    @endphp
-                                    pourcentage d'occupation : {{ number_format($pourcentage, 0) }}%
-                                </span>
-
+                        <div class="w-full h-2.5 bg-gray-200 rounded-full overflow-hidden">
+                            <div class="h-full rounded-full transition-all duration-500
+            {{ $pourcentage >= 80 ? 'bg-red-500' : ($pourcentage >= 50 ? 'bg-orange-400' : 'bg-indigo-600') }}"
+                                style="width: {{ $pourcentage }}%">
                             </div>
-
-                            {{-- Barre de progression --}}
-                            @php
-                                $dateDebut = \Carbon\Carbon::parse($contrat->date_debut);
-                                $dateFin = \Carbon\Carbon::parse($contrat->date_fin);
-                                $totalJours = $dateDebut->diffInDays($dateFin);
-                                $joursEcoules = $dateDebut->diffInDays(now());
-                                $pourcentage =
-                                    $totalJours > 0 ? min(100, max(0, ($joursEcoules / $totalJours) * 100)) : 0;
-                            @endphp
-
-                            <div class="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
-                                <div class="h-full bg-indigo-600 rounded-full shadow-lg"
-                                    style="width: {{ $pourcentage }}%"></div>
-                            </div>
+                        </div>
+                        <div class="flex justify-between mt-2">
+                            <span class="text-[9px] font-black text-gray-300 uppercase">Début</span>
+                            <span class="text-[9px] font-black text-gray-300 uppercase">Fin</span>
                         </div>
                     </div>
 
@@ -224,7 +223,7 @@
                                                         'November' => 'Novembre',
                                                         'December' => 'Décembre',
                                                     ];
-                                                    
+
                                                     [$moisEn, $annee] = explode(' ', $paiement->mois_annee);
                                                     $moisNom = $moisFr[$moisEn] ?? $moisEn;
                                                 @endphp
