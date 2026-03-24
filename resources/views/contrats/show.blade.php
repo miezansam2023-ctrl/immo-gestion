@@ -30,8 +30,8 @@
                         ● Contrat {{ $contrat->statut }}
                     </span>
                     <!-- <button class="bg-[#1E293B] text-white px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-indigo-600 transition-all shadow-xl shadow-indigo-900/10">
-                            Générer PDF
-                        </button> -->
+                                    Générer PDF
+                                </button> -->
                 </div>
             </div>
 
@@ -76,12 +76,14 @@
                         <div class="space-y-3">
                             <div class="flex justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100">
                                 <span class="text-xs font-bold text-gray-400 uppercase">Email</span>
-                                <span class="text-xs font-black text-[#1E293B]">{{ $contrat->locataire->email ?? 'Non renseigné' }}</span>
+                                <span
+                                    class="text-xs font-black text-[#1E293B]">{{ $contrat->locataire->email ?? 'Non renseigné' }}</span>
                             </div>
-                            
+
                             <div class="flex justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100">
                                 <span class="text-xs font-bold text-gray-400 uppercase">Profession</span>
-                                <span class="text-xs font-black text-[#1E293B]">{{ $contrat->locataire->profession ?? 'Non renseigné' }}</span>
+                                <span
+                                    class="text-xs font-black text-[#1E293B]">{{ $contrat->locataire->profession ?? 'Non renseigné' }}</span>
                             </div>
                         </div>
                     </div>
@@ -153,15 +155,16 @@
                                 </div>
 
                                 <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">
-                                    
+
                                     @php
                                         $dateDebut = \Carbon\Carbon::parse($contrat->date_debut);
                                         $dateFin = \Carbon\Carbon::parse($contrat->date_fin);
                                         $totalJours = $dateDebut->diffInDays($dateFin);
                                         $joursEcoules = $dateDebut->diffInDays(now());
-                                        $pourcentage = $totalJours > 0 ? min(100, max(0, ($joursEcoules / $totalJours) * 100)) : 0;
+                                        $pourcentage =
+                                            $totalJours > 0 ? min(100, max(0, ($joursEcoules / $totalJours) * 100)) : 0;
                                     @endphp
-                                    pourcentage d'occupation : {{ number_format($pourcentage, 0) }}% 
+                                    pourcentage d'occupation : {{ number_format($pourcentage, 0) }}%
                                 </span>
 
                             </div>
@@ -188,9 +191,7 @@
                         <div class="flex items-center justify-between mb-10">
                             <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Historique des
                                 Paiements</h3>
-                            <!-- <a href="{{ route('paiements.create', $contrat->id) }}" class="bg-indigo-50 text-indigo-600 px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-600 hover:text-white transition-all">
-                                    Encaisser un loyer
-                                </a> -->
+
                         </div>
 
                         <div class="overflow-hidden">
@@ -205,18 +206,89 @@
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-50">
-                                    {{-- Exemple de ligne --}}
-                                    <tr class="group hover:bg-gray-50 transition-colors">
-                                        <td class="py-6 font-black text-[#1E293B] uppercase italic">Février 2026</td>
-                                        <td class="py-6 text-sm text-gray-500 font-bold">12/02/2026</td>
-                                        <td class="py-6 font-black text-[#1E293B]">
-                                            {{ number_format($contrat->loyer_mensuel, 0, ',', ' ') }} CFA</td>
-                                        <td class="py-6 text-right">
-                                            <span
-                                                class="bg-green-100 text-green-600 px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest">Payé</span>
-                                        </td>
-                                    </tr>
-                                    {{-- Boucle réelle : @foreach ($contrat->paiements as $paiement) ... @endforeach --}}
+                                    @forelse ($contrat->paiements->sortByDesc('date_paiement') as $paiement)
+                                        <tr class="group hover:bg-gray-50 transition-colors">
+                                            <td class="py-6 font-black text-[#1E293B] uppercase italic">
+                                                @php
+                                                    $moisFr = [
+                                                        'January' => 'Janvier',
+                                                        'February' => 'Février',
+                                                        'March' => 'Mars',
+                                                        'April' => 'Avril',
+                                                        'May' => 'Mai',
+                                                        'June' => 'Juin',
+                                                        'July' => 'Juillet',
+                                                        'August' => 'Août',
+                                                        'September' => 'Septembre',
+                                                        'October' => 'Octobre',
+                                                        'November' => 'Novembre',
+                                                        'December' => 'Décembre',
+                                                    ];
+                                                    
+                                                    [$moisEn, $annee] = explode(' ', $paiement->mois_annee);
+                                                    $moisNom = $moisFr[$moisEn] ?? $moisEn;
+                                                @endphp
+                                                {{ $moisNom }} {{ $annee }}
+                                            </td>
+                                            <td class="py-6 text-sm text-gray-500 font-bold">
+                                                {{ \Carbon\Carbon::parse($paiement->date_paiement)->format('d/m/Y') }}
+                                            </td>
+                                            <td class="py-6 font-black text-[#1E293B]">
+                                                {{ number_format($paiement->montant_paye, 0, ',', ' ') }} CFA
+                                                @if ($paiement->reste_a_payer > 0)
+                                                    <div class="text-[9px] text-red-500 font-black uppercase mt-1">
+                                                        Reliquat:
+                                                        {{ number_format($paiement->reste_a_payer, 0, ',', ' ') }}
+                                                    </div>
+                                                @endif
+                                            </td>
+                                            <td class="py-6 text-right">
+                                                @php
+                                                    $statusMap = [
+                                                        'paye' => [
+                                                            'label' => 'Payé',
+                                                            'color' => 'bg-green-100 text-green-600',
+                                                        ],
+                                                        'partiel' => [
+                                                            'label' => 'Partiel',
+                                                            'color' => 'bg-orange-100 text-orange-600',
+                                                        ],
+                                                        'en_attente' => [
+                                                            'label' => 'Attente',
+                                                            'color' => 'bg-yellow-100 text-yellow-600',
+                                                        ],
+                                                        'retard' => [
+                                                            'label' => 'Retard',
+                                                            'color' => 'bg-red-100 text-red-600',
+                                                        ],
+                                                    ];
+                                                    $s = $statusMap[$paiement->statut] ?? [
+                                                        'label' => $paiement->statut,
+                                                        'color' => 'bg-gray-100 text-gray-500',
+                                                    ];
+                                                @endphp
+                                                <span
+                                                    class="px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest {{ $s['color'] }}">
+                                                    {{ $s['label'] }}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="4" class="py-12 text-center text-gray-400 font-bold text-sm">
+                                                <div class="flex flex-col items-center gap-3">
+                                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                                        class="h-10 w-10 text-gray-200" fill="none"
+                                                        viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="1.5"
+                                                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                    </svg>
+                                                    Aucun paiement enregistré pour ce contrat.
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @endforelse
                                 </tbody>
                             </table>
                         </div>
