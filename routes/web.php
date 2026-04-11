@@ -13,9 +13,8 @@ use Faker\Calculator\Ean;
 use Illuminate\Support\Facades\Route;
 
 // Sécurisation contre l'accès direct au fichier .htaccess
-Route::get('.htaccess', function () {
-    abort(403);
-});
+Route::get('.htaccess', fn() => abort(403));
+
 
 // Page d'accueil 
 Route::get('/', function () {
