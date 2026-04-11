@@ -12,6 +12,11 @@ use App\Http\Controllers\Admin\AdminController;
 use Faker\Calculator\Ean;
 use Illuminate\Support\Facades\Route;
 
+// Sécurisation contre l'accès direct au fichier .htaccess
+Route::get('.htaccess', function () {
+    abort(403);
+});
+
 // Page d'accueil 
 Route::get('/', function () {
     return view('welcome');
