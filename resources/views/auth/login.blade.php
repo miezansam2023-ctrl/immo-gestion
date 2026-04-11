@@ -7,36 +7,21 @@
     </div>
 
     @if (session('success'))
-        <div id="success-alert"
-            class="relative mb-8 flex items-center p-4 bg-emerald-50 border-l-4 border-emerald-500 rounded-r-2xl shadow-sm">
-            <div class="flex-shrink-0 bg-emerald-500 rounded-full p-1">
-                <svg class="h-4 w-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
-                </svg>
-            </div>
-            <div class="ml-4">
-                <h3 class="text-xs font-black text-emerald-900 uppercase tracking-widest">Opération réussie</h3>
-                <p class="text-[11px] font-bold text-emerald-700 mt-0.5">{{ session('success') }}</p>
-            </div>
-            <button onclick="document.getElementById('success-alert').remove()" class="ml-auto p-2 group">
-                <svg class="h-5 w-5 text-emerald-300 hover:text-emerald-600 transition-colors" fill="none"
-                    stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
-                    </path>
-                </svg>
-            </button>
-        </div>
-    @endif
-
-    @if ($errors->any())
-        <div class="max-w-7xl mx-auto mt-4 p-4 bg-red-100 border-l-4 border-red-500 text-red-700">
-            <p class="font-bold">Oups ! Il y a des erreurs :</p>
-            <ul class="list-disc ml-5">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+            (function() {
+                let message = @json(session('success'));
+                Swal.fire({
+                    title: 'Opération réussie',
+                    html: message,
+                    icon: 'success',
+                    confirmButtonColor: '#10b981',
+                    confirmButtonText: 'OK',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                });
+            })();
+        </script>
     @endif
 
     <x-auth-session-status class="mb-6" :status="session('status')" />
@@ -104,7 +89,7 @@
         <div class="pt-4">
             <button type="submit"
                 class="w-full bg-gray-900 hover:bg-black text-white py-5 rounded-2xl font-black text-sm uppercase tracking-[0.2em] shadow-xl hover:shadow-indigo-200 transition-all transform hover:-translate-y-1 active:scale-95">
-                Se connecter au Dashboard
+                Se connecter 
             </button>
         </div>
 

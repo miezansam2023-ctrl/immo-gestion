@@ -97,10 +97,11 @@
                                 <div class="text-[10px] text-gray-400 font-medium">{{ $locataire->email }}</div>
                             </td>
                             <td class="px-8 py-6">
-                                @if ($locataire->contrats->count() > 0)
+                                @php $contratActif = $locataire->contrats->where('statut', 'actif')->first() @endphp
+                                @if ($contratActif)
                                     <span
                                         class="inline-block px-3 py-1 bg-emerald-50 text-emerald-600 rounded-lg text-[9px] font-black uppercase tracking-tighter italic border border-emerald-100">
-                                        {{ $locataire->contrats->first()->bien->titre }}
+                                        {{ $contratActif->bien->titre }}
                                     </span>
                                 @else
                                     <span class="text-[9px] font-bold text-gray-300 uppercase tracking-widest">En
@@ -123,7 +124,11 @@
             </table>
         </div>
 
-        <div x-show="openModal" class="fixed inset-0 z-50 overflow-y-auto" x-cloak>
+        <div class="p-6 bg-gray-50 border-t border-gray-100">
+            {{ $locataires->links() }}
+        </div>
+
+        <div x-show="openModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto">
             <div class="flex items-start justify-center min-h-screen p-4 py-8">
                 <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm" @click="openModal = false"></div>
 
@@ -142,8 +147,8 @@
                                 <p class="text-emerald-600 font-bold uppercase text-[9px] tracking-widest">Veuillez remplir
                                     tous les champs obligatoires</p>
                             </div>
-                            <button type="button" @click="openModal = false"
-                                class="w-12 h-12 flex items-center justify-center rounded-full bg-white text-gray-400 hover:text-red-500 shadow-sm transition-colors">
+                            <button @click="openModal = false"
+                                class="w-12 h-12 rounded-2xl bg-gray-50 text-gray-400 hover:bg-red-50 hover:text-red-500 transition-all">
                                 <i class="fas fa-times"></i>
                             </button>
                         </div>
@@ -256,6 +261,11 @@
                                                 <input type="date" name="date_expiration_piece"
                                                     class="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl font-bold text-xs">
                                             </div>
+                                        </div>
+                                        <div class="md:col-span-2">
+                                            <label class="block text-[10px] font-black text-gray-400 uppercase mb-2">Lieu de délivrance</label>
+                                            <input type="text" name="lieu_delivrance_piece"
+                                                class="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl font-bold text-xs">
                                         </div>
                                     </div>
                                 </div>
@@ -427,6 +437,6 @@
                     </form>
                 </div>
             </div>
-        </div>
+    </div>
     </div>
 @endsection

@@ -26,12 +26,23 @@
             </div>
         </div>
 
-        <div>
-            <label for="email" class="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2 ml-1">Adresse Email</label>
-            <input id="email" type="email" name="email" :value="old('email')"
-                class="block w-full px-5 py-4 bg-gray-50 border-none rounded-2xl focus:bg-white focus:ring-2 focus:ring-indigo-500 transition-all text-sm font-bold text-gray-700 shadow-sm"
-                required />
-            <x-input-error :messages="$errors->get('email')" class="mt-2 text-xs" />
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+            <div>
+                <label for="telephone" class="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2 ml-1">Téléphone</label>
+                <input id="telephone" type="tel" name="telephone" :value="old('telephone')"
+                    class="block w-full px-5 py-4 bg-gray-50 border-none rounded-2xl focus:bg-white focus:ring-2 focus:ring-indigo-500 transition-all text-sm font-bold text-gray-700 shadow-sm"
+                    required />
+                <x-input-error :messages="$errors->get('telephone')" class="mt-2 text-xs" />
+            </div>
+            <div>
+                <label for="email" class="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2 ml-1">Adresse Email</label>
+                <input id="email" type="email" name="email" :value="old('email')"
+                    class="block w-full px-5 py-4 bg-gray-50 border-none rounded-2xl focus:bg-white focus:ring-2 focus:ring-indigo-500 transition-all text-sm font-bold text-gray-700 shadow-sm"
+                    required />
+                <x-input-error :messages="$errors->get('email')" class="mt-2 text-xs" />
+            </div>
+            
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -42,7 +53,7 @@
                     required autocomplete="new-password" />
             </div>
             <div>
-                <label for="password_confirmation" class="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2 ml-1">Confirmation</label>
+                <label for="password_confirmation" class="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2 ml-1">Confirmer le mot de passe</label>
                 <input id="password_confirmation" type="password" name="password_confirmation"
                     class="block w-full px-5 py-4 bg-gray-50 border-none rounded-2xl focus:bg-white focus:ring-2 focus:ring-indigo-500 transition-all text-sm font-bold text-gray-700 shadow-sm"
                     required />
@@ -63,7 +74,6 @@
             </div>
         </div>
     </form>
-    </div>
 
 
 </x-guest-layout>

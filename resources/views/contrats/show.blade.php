@@ -28,10 +28,15 @@
                         class="px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-sm 
                     {{ $contrat->statut == 'actif' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600' }}">
                         ● Contrat {{ $contrat->statut }}
+                        @if($contrat->statut == 'resilie' && $contrat->date_resiliation)
+                            <br><span class="text-[8px] font-bold normal-case mt-1 block">
+                                le {{ $contrat->date_resiliation_fr }} à {{ $contrat->date_resiliation->format('H:i') }}
+                            </span>
+                        @endif
                     </span>
-                    <!-- <button class="bg-[#1E293B] text-white px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-indigo-600 transition-all shadow-xl shadow-indigo-900/10">
-                                                Générer PDF
-                                            </button> -->
+                    <a href="{{ route('contrats.pdf', $contrat->id) }}" class="bg-[#1E293B] text-white px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-indigo-600 transition-all shadow-xl shadow-indigo-900/10">
+                        Générer PDF
+                    </a> 
                 </div>
             </div>
 
@@ -48,7 +53,6 @@
                                 class="h-20 w-20 rounded-2xl bg-indigo-50 overflow-hidden shadow-inner border border-gray-100">
                                 @if ($contrat->locataire->photo)
                                     @php
-                                        // On nettoie le chemin au cas où "public/" est resté
                                         $cheminPhoto = str_replace('public/', '', $contrat->locataire->photo);
                                     @endphp
                                     <img src="{{ asset('storage/' . $cheminPhoto) }}" class="w-full h-full object-cover"
@@ -68,7 +72,7 @@
                                 @endif
                             </div>
                             <div>
-                                <p class="text-xl font-black text-[#1E293B] uppercase italic">{{ $contrat->locataire->nom }}
+                                <p class="text-xl font-black text-[#1E293B] uppercase italic">{{ $contrat->locataire->nom }} 
                                 </p>
                                 <p class="text-xs font-bold text-gray-400">{{ $contrat->locataire->telephone }}</p>
                             </div>
@@ -98,9 +102,10 @@
                             <img src="{{ asset('storage/' . $photoBien) }}"
                                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
                         </div>
-                        <p class="text-lg font-black text-[#1E293B] uppercase italic">{{ $contrat->bien->titre }}</p>
-                        <p class="text-xs font-bold text-gray-400 mb-6"> {{ $contrat->bien->quartier }},
-                            {{ $contrat->bien->adresse }}</p>
+                        <p class="text-lg font-black text-[#1E293B] uppercase italic"> {{ $contrat->bien->titre }}</p>
+                        <p class="text-xs font-bold text-gray-400 mb-6">Commune : {{ $contrat->bien->commune }} | Quartier
+                            : {{ $contrat->bien->quartier }} <br>
+                            Rue , Lot , Ilot : {{ $contrat->bien->adresse }}</p>
                         <a href="{{ route('biens.show', $contrat->bien) }}"
                             class="inline-flex items-center text-xs font-black text-indigo-600 uppercase tracking-widest">
                             Fiche du bien
@@ -136,7 +141,8 @@
                         </div>
                         <div class="relative pl-4">
                             <div class="absolute left-0 top-0 w-1 h-full bg-gray-200 rounded-full"></div>
-                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Durée</p>
+                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Durée du contrat
+                            </p>
                             <p class="text-xl font-black text-[#1E293B] italic">{{ $contrat->duree_mois ?? '0' }}</p>
                             <span class="text-[10px] font-black text-gray-400 uppercase">Mois</span>
                         </div>
@@ -147,15 +153,24 @@
                             <p class="text-xl font-black text-[#1E293B] italic">{{ $contrat->jour_paiement }}</p>
                             <span class="text-[10px] font-black text-gray-400 uppercase">Du mois</span>
                         </div>
-                    </div> *
-                    
-                    {{-- Période d'occupation — EN DEHORS du grid --}}
+                    </div>
+
+                    {{-- Période d'occupation  --}}
                     @php
                         $dateDebut = \Carbon\Carbon::parse($contrat->date_debut);
                         $dateFin = \Carbon\Carbon::parse($contrat->date_fin);
                         $totalJours = $dateDebut->diffInDays($dateFin);
-                        $joursEcoules = $dateDebut->diffInDays(now());
+
+                        if (now()->lt($dateDebut)) {
+                            $joursEcoules = 0;
+                        } elseif (now()->gt($dateFin)) {
+                            $joursEcoules = $totalJours;
+                        } else {
+                            $joursEcoules = $dateDebut->diffInDays(now());
+                        }
+
                         $pourcentage = $totalJours > 0 ? min(100, max(0, ($joursEcoules / $totalJours) * 100)) : 0;
+                        
                     @endphp
 
                     <div class="mt-6 p-6 bg-gray-50 rounded-[2rem] border border-gray-100">
@@ -205,7 +220,7 @@
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-50">
-                                    @forelse ($contrat->paiements->sortByDesc('date_paiement') as $paiement)
+                                    @forelse ($paiements as $paiement)
                                         <tr class="group hover:bg-gray-50 transition-colors">
                                             <td class="py-6 font-black text-[#1E293B] uppercase italic">
                                                 @php
@@ -290,6 +305,9 @@
                                     @endforelse
                                 </tbody>
                             </table>
+                        </div>
+                        <div class="mt-6">
+                            {{ $paiements->links() }}
                         </div>
                     </div>
 

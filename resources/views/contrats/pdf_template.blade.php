@@ -50,8 +50,7 @@
 
     <div class="header">
         <div class="ref-box">DOSSIER N° {{ $contrat->numero }}</div>
-        <div class="company-name">IMMOGESTION PROFESSIONNELLE</div>
-        <div style="font-size: 10px;">Mandataire Immobilier - Gestion Locative & Syndic de Copropriété</div>
+        <div class="company-name">IMMOGESTION </div>
     </div>
 
     <div class="main-title">
@@ -68,8 +67,9 @@
         <div class="section-title">Article 2 - Objet et Destination</div>
         <p>Le Bailleur loue au Preneur, qui l'accepte, le bien immobilier suivant :<br>
            <strong>Type :</strong> {{ $contrat->bien->titre }} <br>
-           <strong>Localisation :</strong> {{ $contrat->bien->adresse }} <br>
-           Le local est strictement destiné à l'usage d'habitation. Toute activité commerciale ou professionnelle y est interdite.</p>
+           <strong>Localisation :</strong> {{ $contrat->bien->commune }}, {{ $contrat->bien->quartier }}  - {{ $contrat->bien->adresse }} <br>
+           
+        </p>
     </div>
 
     <div class="section">
@@ -86,11 +86,11 @@
                 <td><strong>{{ number_format($contrat->loyer_mensuel, 0, ',', ' ') }} FCFA</strong></td>
             </tr>
             <tr>
-                <td class="label">Dépôt de Garantie (Caution)</td>
+                <td class="label">Caution</td>
                 <td>{{ number_format($contrat->caution, 0, ',', ' ') }} FCFA</td>
             </tr>
             <tr>
-                <td class="label">Frais de Dossier & Honoraires</td>
+                <td class="label">Frais d'Agence</td>
                 <td>{{ number_format($contrat->frais_agence ?? 0, 0, ',', ' ') }} FCFA</td>
             </tr>
             <tr>

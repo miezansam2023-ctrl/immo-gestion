@@ -5,8 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Contrat;
 use App\Models\Bien;
 use App\Models\Locataire;
+use App\Models\Paiement;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Database\QueryException;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class ContratController extends Controller
@@ -33,11 +36,12 @@ class ContratController extends Controller
 
         return view('contrats.index', compact('contrats', 'biens', 'locataires'));
     }
-    /**
-     * Enregistre le contrat
-     */
+    // Enregistre le contrat
+    
     public function store(Request $request)
-    {
+    {   
+        
+
         $validated = $request->validate([
             'bien_id' => 'required|exists:biens,id',
             'locataire_id' => 'required|exists:locataires,id',
@@ -47,13 +51,14 @@ class ContratController extends Controller
             'caution' => 'required|numeric',
             'mode_paiement' => 'required|string',
             'jour_paiement' => 'required|integer|between:1,31',
-            // Ajoute les autres champs si nécessaire...
             'animaux_autorises' => 'sometimes|boolean',
             'renouvellement_automatique' => 'sometimes|boolean',
             'date_signature' => 'sometimes|date',
             'clauses_particulieres' => 'nullable|string',
             'date_etat_lieux_entree' => 'nullable|date',
             'frais_agence' => 'nullable|numeric',
+            'notes' => 'nullable|string',
+            'etat_lieux_entree' => 'nullable|string',
         ]);
 
         // 1. On parse la date
@@ -77,7 +82,33 @@ class ContratController extends Controller
         // 6. Mise à jour du bien
         $contrat->bien->update(['statut' => 'occupe']);
 
-        return redirect()->route('contrats.index')->with('success', "Le bail {$contrat->numero} a été généré avec succès !");
+        // 7. Créer le paiement pour le premier mois (considéré comme payé)
+        $datePremierMois = \Carbon\Carbon::parse($request->date_debut);
+        $moisAnneePremier = ucfirst($datePremierMois->locale('fr')->translatedFormat('F Y'));
+
+        \App\Models\Paiement::create([
+            'contrat_id'      => $contrat->id,
+            'locataire_id'    => $contrat->locataire_id,
+            'bien_id'         => $contrat->bien_id,
+            'gestionnaire_id' => auth()->id(),
+            'numero'          => (new \App\Models\Paiement)->genererNumero(),
+            'type'            => 'loyer',
+            'type_selection'  => 'simple',
+            'montant_du'      => $contrat->loyer_mensuel,
+            'montant_paye'    => $contrat->loyer_mensuel,
+            'reste_a_payer'   => 0,
+            'periode_debut'   => $datePremierMois->copy()->startOfMonth()->toDateString(),
+            'periode_fin'     => $datePremierMois->copy()->endOfMonth()->toDateString(),
+            'date_echeance'   => $datePremierMois->copy()->startOfMonth()->toDateString(),
+            'date_paiement'   => $request->date_signature ?? $request->date_debut,
+            'mode_paiement'   => $request->mode_paiement,
+            'mois_annee'      => $moisAnneePremier,
+            'statut'          => 'paye',
+            'reference_paiement' => 'Paiement initial - Premier mois',
+            'notes'           => 'Paiement automatique lors de la validation du contrat',
+        ]);
+
+        return redirect()->route('contrats.index')->with('success', "Le bail {$contrat->numero} a été généré avec succès ! Le premier mois est marqué comme payé.");
     }
 
     /**
@@ -85,8 +116,13 @@ class ContratController extends Controller
      */
     public function show(Contrat $contrat)
     {
-        $contrat->load(['bien', 'locataire', 'paiements']);
-        return view('contrats.show', compact('contrat'));
+        $contrat->load(['bien', 'locataire']);
+
+        $paiements = $contrat->paiements()
+            ->orderByDesc('date_paiement')
+            ->paginate(5);
+
+        return view('contrats.show', compact('contrat', 'paiements'));
     }
 
     public function generatePDF($id)
@@ -140,6 +176,22 @@ class ContratController extends Controller
         // Gestion propre des checkboxes (si décoché, n'existe pas dans $request)
         $validated['renouvellement_automatique'] = $request->has('renouvellement_automatique');
         $validated['animaux_autorises'] = $request->has('animaux_autorises');
+
+        // Si le statut passe à "résilié", mettre à jour le bien et ajouter la date + heure de résiliation
+        if ($request->statut === 'resilie' && $contrat->statut !== 'resilie') {
+            $validated['date_resiliation'] = now();
+            // Remettre le bien en disponible
+            if ($contrat->bien) {
+                $contrat->bien->update(['statut' => 'disponible']);
+            }
+        }
+
+        // Si le statut repasse à "actif", remettre le bien en occupé
+        if ($request->statut === 'actif' && $contrat->statut === 'resilie') {
+            if ($contrat->bien) {
+                $contrat->bien->update(['statut' => 'occupe']);
+            }
+        }
 
         $contrat->update($validated);
 

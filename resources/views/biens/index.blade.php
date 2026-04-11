@@ -14,43 +14,77 @@
                     Liste des biens enregistrés
                 </p>
             </div>
-            {{-- Barre de recherche proprement intégrée --}}
-            <form action="{{ route('biens.index') }}" method="GET" class="relative w-full max-w-lg group">
-                <div class="relative flex items-center">
-                    <span class="absolute left-5 text-slate-400 group-focus-within:text-indigo-600 transition-colors">
-                        <i class="fas fa-search text-sm"></i>
-                    </span>
+            {{-- Filtres de recherche --}}
+            <div class="flex flex-col sm:flex-row gap-4 w-full max-w-2xl">
+                {{-- Barre de recherche --}}
+                <form action="{{ route('biens.index') }}" method="GET" class="relative flex-1 group">
+                    <div class="relative flex items-center">
+                        <span class="absolute left-5 text-slate-400 group-focus-within:text-indigo-600 transition-colors">
+                            <i class="fas fa-search text-sm"></i>
+                        </span>
 
-                    <input type="text" name="search" value="{{ request('search') }}"
-                        placeholder="Rechercher un bien, une ville..."
-                        class="w-full bg-white border border-gray-100 py-5 pl-14 pr-28 rounded-[2rem] shadow-sm focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 font-black text-[11px] uppercase tracking-wider text-slate-700 placeholder:text-slate-300 placeholder:font-bold transition-all outline-none italic">
+                        <input type="text" name="search" value="{{ request('search') }}"
+                            placeholder="Rechercher un bien, une ville..."
+                            class="w-full bg-white border border-gray-100 py-5 pl-14 pr-28 rounded-[2rem] shadow-sm focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 font-black text-[11px] uppercase tracking-wider text-slate-700 placeholder:text-slate-300 placeholder:font-bold transition-all outline-none italic">
 
-                    <div class="absolute right-2">
-                        <button type="submit"
-                            class="bg-indigo-600 text-white px-5 py-3 rounded-[1.5rem] font-black text-[9px] uppercase tracking-widest hover:bg-gray-900 transition-all active:scale-95">
-                            Rechercher
-                        </button>
+                        <div class="absolute right-2">
+                            <button type="submit"
+                                class="bg-indigo-600 text-white px-5 py-3 rounded-[1.5rem] font-black text-[9px] uppercase tracking-widest hover:bg-gray-900 transition-all active:scale-95">
+                                Rechercher
+                            </button>
+                        </div>
                     </div>
-                </div>
 
-                @if (request('search'))
-                    @if ($biens->isEmpty())
-                        {{-- Cas : Aucun résultat trouvé --}}
-                        <a href="{{ route('biens.index') }}"
-                            class="absolute -bottom-6 left-6 text-[9px] font-black text-red-500 uppercase tracking-tighter hover:text-red-700 transition-colors">
-                            <i class="fas fa-times-circle mr-1"></i> Aucun élément trouvé pour
-                            "{{ request('search') }}". Réinitialiser la recherche.
-                        </a>
-                    @else
-                        {{-- Cas : Résultats trouvés, on affiche un bouton pour annuler --}}
-                        <a href="{{ route('biens.index') }}"
-                            class="absolute -bottom-6 left-6 text-[9px] font-black text-emerald-500 uppercase tracking-tighter hover:text-emerald-700 transition-colors">
-                            <i class="fas fa-check-circle mr-1"></i> {{ $biens->count() }} résultat(s) trouvé(s).
-                            Cliquez pour effacer.
-                        </a>
+                    {{-- Garder le paramètre statut si présent --}}
+                    @if(request('statut') && request('statut') !== 'tous')
+                        <input type="hidden" name="statut" value="{{ request('statut') }}">
                     @endif
-                @endif
-            </form>
+
+                    @if (request('search'))
+                        @if ($biens->isEmpty())
+                            {{-- Cas : Aucun résultat trouvé --}}
+                            <a href="{{ route('biens.index') }}"
+                                class="absolute -bottom-6 left-6 text-[9px] font-black text-red-500 uppercase tracking-tighter hover:text-red-700 transition-colors">
+                                <i class="fas fa-times-circle mr-1"></i> Aucun élément trouvé pour
+                                "{{ request('search') }}". Réinitialiser la recherche.
+                            </a>
+                        @else
+                            {{-- Cas : Résultats trouvés, on affiche un bouton pour annuler --}}
+                            <a href="{{ route('biens.index') }}"
+                                class="absolute -bottom-6 left-6 text-[9px] font-black text-emerald-500 uppercase tracking-tighter hover:text-emerald-700 transition-colors">
+                                <i class="fas fa-check-circle mr-1"></i> {{ $biens->count() }} résultat(s) trouvé(s).
+                                Cliquez pour effacer.
+                            </a>
+                        @endif
+                    @endif
+                </form>
+
+                {{-- Filtre par statut --}}
+                <form action="{{ route('biens.index') }}" method="GET" class="relative">
+                    <select name="statut" onchange="this.form.submit()"
+                        class="bg-white border border-gray-100 py-5 px-6 pr-12 rounded-[2rem] shadow-sm focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 font-black text-[11px] uppercase tracking-wider text-slate-700 transition-all outline-none appearance-none">
+                        <option value="tous" {{ request('statut') == 'tous' || !request('statut') ? 'selected' : '' }}>
+                            Tous les statuts
+                        </option>
+                        <option value="disponible" {{ request('statut') == 'disponible' ? 'selected' : '' }}>
+                            Disponible
+                        </option>
+                        <option value="occupe" {{ request('statut') == 'occupe' ? 'selected' : '' }}>
+                            Occupé
+                        </option>
+                        <option value="maintenance" {{ request('statut') == 'maintenance' ? 'selected' : '' }}>
+                            Maintenance
+                        </option>
+                    </select>
+                    <span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+                        <i class="fas fa-chevron-down text-xs"></i>
+                    </span>
+                    {{-- Garder le paramètre search si présent --}}
+                    @if(request('search'))
+                        <input type="hidden" name="search" value="{{ request('search') }}">
+                    @endif
+                </form>
+            </div>
 
             <button @click="openModal = true"
                 class="px-8 py-4 bg-indigo-600 text-white rounded-2xl font-black text-[11px] uppercase tracking-widest hover:bg-indigo-700 hover:-translate-y-1 transition-all shadow-lg shadow-indigo-100 flex items-center">
@@ -163,7 +197,7 @@
                                         class="w-9 h-9 flex items-center justify-center rounded-xl bg-gray-50 text-gray-400 hover:bg-indigo-600 hover:text-white transition-all shadow-sm"><i
                                             class="fas fa-edit text-xs"></i></a>
                                     <form action="{{ route('biens.destroy', $bien->id) }}" method="POST" class="inline"
-                                        onsubmit="return confirm('Supprimer ce bien ?');">
+                                        onsubmit="event.preventDefault(); confirmDelete('Êtes-vous sûr de vouloir supprimer ce bien ?').then(confirmed => { if(confirmed) this.submit(); })">
                                         @csrf @method('DELETE')
                                         <button type="submit"
                                             class="w-9 h-9 flex items-center justify-center rounded-xl bg-gray-50 text-gray-300 hover:bg-red-50 hover:text-red-500 transition-all shadow-sm"><i
@@ -175,6 +209,10 @@
                     @endforeach
                 </tbody>
             </table>
+        </div>
+
+        <div class="p-6 bg-gray-50 border-t border-gray-100">
+            {{ $biens->links() }}
         </div>
 
         {{-- MODAL DU FORMULAIRE --}}
@@ -263,10 +301,7 @@
                                                     <input type="number" name="nombre_pieces"
                                                         class="w-full px-5 py-3 bg-white border-none rounded-xl text-center font-black text-indigo-600">
                                                 </div>
-                                                <!-- <div>
-                                                    <label class="block text-[9px] font-black text-indigo-400 uppercase mb-2 text-center">Chambres</label>
-                                                    <input type="number" name="nombre_chambres" class="w-full px-2 py-3 bg-white border-none rounded-xl text-center font-black text-indigo-600">
-                                                </div> -->
+                                                
                                                 <div>
                                                     <label
                                                         class="block text-[9px] font-black text-indigo-400 uppercase mb-2 text-center">Salles
@@ -347,7 +382,7 @@
                                     </div>
 
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                        {{-- Remplace la section Galerie Photo dans ton Modal par celle-ci --}}
+                                        
                                         <div class="bg-white p-8 rounded-[2rem] border-2 border-dashed border-gray-200"
                                             x-data="{
                                                 images: [],
@@ -446,7 +481,7 @@
                                                     <span class="absolute left-6 top-6 text-white/20 font-black">CFA</span>
                                                 </div>
                                             </div>
-                                            <div class="grid grid-cols-2 gap-4">
+                                            {{-- <div class="grid grid-cols-2 gap-4">
                                                 <div>
                                                     <label
                                                         class="block text-[9px] font-black uppercase text-white/40 mb-2">Caution</label>
@@ -459,7 +494,7 @@
                                                     <input type="number" name="charges"
                                                         class="w-full bg-white/5 border-none rounded-xl py-3 px-4 text-lg font-bold">
                                                 </div>
-                                            </div>
+                                            </div> --}}
                                         </div>
                                         <div
                                             class="absolute -right-10 -bottom-10 w-40 h-40 bg-indigo-500/10 rounded-full blur-3xl">

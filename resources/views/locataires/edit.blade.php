@@ -4,7 +4,7 @@
 
 @section('content')
     <div class="max-w-7xl mx-auto px-4 py-10">
-        {{-- Fil d'ariane / Retour --}}
+        {{-- Fil de Retour --}}
         <div class="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
                 <a href="{{ route('locataires.index') }}"
@@ -28,17 +28,6 @@
                 </div>
             </div>
         </div>
-
-        @if ($errors->any())
-            <div class="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-r-2xl">
-                <h3 class="text-xs font-black text-red-800 uppercase tracking-widest mb-2">Erreurs de validation</h3>
-                <ul class="list-disc list-inside">
-                    @foreach ($errors->all() as $error)
-                        <li class="text-[11px] font-bold text-red-600 uppercase">{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
 
         <form action="{{ route('locataires.update', $locataire->id) }}" method="POST" enctype="multipart/form-data">
             @csrf
@@ -158,6 +147,12 @@
                                         value="{{ old('date_expiration_piece', $locataire->date_expiration_piece ? \Carbon\Carbon::parse($locataire->date_expiration_piece)->format('Y-m-d') : '') }}"
                                         class="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl font-bold text-sm">
                                 </div>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-[10px] font-black text-gray-400 uppercase mb-2">Lieu de délivrance</label>
+                                <input type="text" name="lieu_delivrance_piece"
+                                    value="{{ old('lieu_delivrance_piece', $locataire->lieu_delivrance_piece) }}"
+                                    class="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl font-bold text-sm">
                             </div>
                         </div>
                     </div>
@@ -365,10 +360,12 @@
                         </div>
                     </div>
 
-                    {{-- Action Finale --}}
+                    {{-- Action  --}}
                     <button type="submit"
                         class="w-full py-6 bg-indigo-600 text-white rounded-[2rem] font-black text-sm uppercase tracking-[0.2em] shadow-xl shadow-indigo-100 hover:bg-indigo-700 hover:-translate-y-1 transition-all">
+                        <i class="fas fa-save group-hover:scale-110 transition-transform"></i>
                         Mettre à jour le dossier
+                        <i class="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
                     </button>
                     
                 </div>

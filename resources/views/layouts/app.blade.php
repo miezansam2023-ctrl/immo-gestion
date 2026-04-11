@@ -8,6 +8,114 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // ─── FONCTIONS SWEETALERT2 GLOBALES ─────────────────────────────────
+
+        /**
+         * Confirmation standard avec SweetAlert2
+         */
+        async function confirmDelete(message = 'Êtes-vous sûr ?') {
+            const result = await Swal.fire({
+                title: 'Confirmation',
+                html: message,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Oui, continuer',
+                cancelButtonText: 'Annuler',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+            });
+            return result.isConfirmed;
+        }
+
+        /**
+         * Confirmation de déconnexion
+         */
+        async function confirmLogout() {
+            const result = await Swal.fire({
+                title: 'Déconnexion',
+                html: 'Êtes-vous sûr de vouloir vous déconnecter ?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Oui, me déconnecter',
+                cancelButtonText: 'Annuler',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+            });
+            return result.isConfirmed;
+        }
+
+        /**
+         * Confirmation de (dés)activation d'un compte
+         */
+        async function confirmToggle(action, userName, form) {
+            const result = await Swal.fire({
+                title: action === 'desactiver' ? 'Désactivation de compte' : 'Activation de compte',
+                html: `Êtes-vous sûr de vouloir ${action === 'desactiver' ? 'désactiver' : 'activer'} le compte de <strong>${userName}</strong> ?`,
+                icon: action === 'desactiver' ? 'warning' : 'question',
+                showCancelButton: true,
+                confirmButtonColor: action === 'desactiver' ? '#dc2626' : '#16a34a',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: action === 'desactiver' ? 'Oui, désactiver' : 'Oui, activer',
+                cancelButtonText: 'Annuler',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+            });
+            if (result.isConfirmed && form) {
+                form.submit();
+            }
+            return result.isConfirmed;
+        }
+
+        /**
+         * Alerte simple
+         */
+        function alertWithSweetAlert(message, type = 'info') {
+            Swal.fire({
+                title: type.charAt(0).toUpperCase() + type.slice(1),
+                html: message,
+                icon: type,
+                confirmButtonColor: '#1e293b',
+                confirmButtonText: 'OK',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+            });
+        }
+
+        /**
+         * Toast (notification)
+         */
+        function toastWithSweetAlert(message, type = 'success', timer = 3000) {
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'bottom-end',
+                showConfirmButton: false,
+                timer: timer,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.onmouseenter = Swal.stopTimer;
+                    toast.onmouseleave = Swal.resumeTimer;
+                }
+            });
+            Toast.fire({
+                icon: type,
+                title: message
+            });
+        }
+    </script>
+
+    {{--  --}}
+    <style>
+        [x-cloak] {
+            display: none !important;
+        }
+    </style>
+
 </head>
 
 <body class="bg-gray-100 font-sans">
@@ -17,9 +125,9 @@
                 <div class="flex justify-between items-center h-16">
 
                     {{-- Logo --}}
-                    <span class="text-xl font-black uppercase tracking-tighter text-indigo-600">
+                    <a href="{{ route('dashboard') }}" class="text-xl font-black uppercase tracking-tighter text-indigo-600">
                         Immo<span class="text-slate-900">Gestion</span>
-                    </span>
+                    </a>
 
                     {{-- Menu desktop --}}
                     <div class="hidden lg:flex items-center space-x-8">
@@ -64,7 +172,8 @@
                             </div>
 
                             {{-- Bouton logout desktop --}}
-                            <form method="POST" action="{{ route('logout') }}" class="hidden lg:block">
+                            <form method="POST" action="{{ route('logout') }}" class="hidden lg:block"
+                                onsubmit="event.preventDefault(); confirmLogout().then(confirmed => { if(confirmed) this.submit(); })">
                                 @csrf
                                 <button type="submit" class="text-gray-400 hover:text-red-500 transition">
                                     <i class="fas fa-sign-out-alt"></i>
@@ -110,7 +219,8 @@
                         <i class="fas fa-cog w-4"></i> Paramètres
                     </a>
                     {{-- Logout mobile --}}
-                    <form method="POST" action="{{ route('logout') }}" class="pt-1 border-t border-gray-100">
+                    <form method="POST" action="{{ route('logout') }}" class="pt-1 border-t border-gray-100"
+                        onsubmit="event.preventDefault(); confirmLogout().then(confirmed => { if(confirmed) this.submit(); })">
                         @csrf
                         <button type="submit"
                             class="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-medium text-red-500 hover:bg-red-50">
@@ -120,55 +230,75 @@
                 </div>
             </div>
         </nav>
+        
+        {{-- DATE & HEURE en bas de la navbar --}}
+        <div class="max-w-7xl mx-auto px-2 sm:px-2 lg:px-2 py-2">
+            <div class="flex justify-center">
+                <div
+                    class="bg-gradient-to-r from-gray-50 to-gray-100 shadow-inner rounded-full border border-gray-200">
+                    <div class="flex items-center space-x-3 text-sm">
+                        <span class="font-medium text-gray-700 tracking-wide">
+                            {{ Carbon\Carbon::now()->locale('fr')->isoFormat('dddd D MMMM YYYY') }}
+                        </span>
+                        <span class="text-gray-400">•</span>
+                        <span class="font-mono text-indigo-600 font-semibold">
+                            {{ Carbon\Carbon::now()->format('H:i') }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <main class="py-10">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
                 {{-- Alertes de Succès --}}
-                {{-- @if (session('success'))
-                    <div x-data="{ show: true }" x-show="show"
-                        class="mb-6 flex items-center p-4 bg-emerald-50 border-l-4 border-emerald-500 rounded-r-2xl shadow-sm">
-                        <div class="ml-4">
-                            <p class="text-[11px] font-bold text-emerald-700 uppercase">{{ session('success') }}</p>
-                        </div>
-                        <button @click="show = false" class="ml-auto text-emerald-300 hover:text-emerald-600">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                @endif --}}
-
                 @if (session('success'))
-                    <div x-data="{ show: true }" x-show="show"
-                        class="relative mb-8 flex items-center p-4 bg-emerald-50 border-l-4 border-emerald-500 rounded-r-2xl shadow-sm">
-                        <div class="flex-shrink-0 bg-emerald-500 rounded-full p-1">
-                            <svg class="h-4 w-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
-                                    d="M5 13l4 4L19 7"></path>
-                            </svg>
-                        </div>
-                        <div class="ml-4">
-                            <h3 class="text-xs font-black text-emerald-900 uppercase tracking-widest">Opération réussie
-                            </h3>
-                            <p class="text-[11px] font-bold text-emerald-700 mt-0.5">{{ session('success') }}</p>
-                        </div>
-                        <button @click="show = false" class="ml-auto p-2 group"><svg
-                                class="h-5 w-5 text-emerald-300 group-hover:text-emerald-600 transition-colors"
-                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M6 18L18 6M6 6l12 12"></path>
-                            </svg></button>
-                    </div>
+                    <script>
+                        (function() {
+                            let message = @json(session('success'));
+                            if (typeof Swal !== 'undefined') {
+                                Swal.fire({
+                                    title: 'Opération réussie',
+                                    html: message,
+                                    icon: 'success',
+                                    confirmButtonColor: '#10b981',
+                                    confirmButtonText: 'OK',
+                                    allowOutsideClick: false,
+                                    allowEscapeKey: false,
+                                });
+                            } else if (typeof alert !== 'undefined') {
+                                alert(message);
+                            }
+                        })();
+                    </script>
                 @endif
 
+                {{-- Alertes d'Erreur --}}
                 @if ($errors->any())
-                    <div class="max-w-7xl mx-auto mt-4 p-4 bg-red-100 border-l-4 border-red-500 text-red-700">
-                        <p class="font-bold">Oups ! Il y a des erreurs :</p>
-                        <ul class="list-disc ml-5">
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
+                    <script>
+                        (function() {
+                            let errors = @json($errors->all());
+                            let errorHtml = '<ul class="list-disc ml-5 mt-1">';
+                            errors.forEach(function(error) {
+                                errorHtml += '<li>' + error + '</li>';
+                            });
+                            errorHtml += '</ul>';
+                            if (typeof Swal !== 'undefined') {
+                                Swal.fire({
+                                    title: 'Oups ! Des erreurs ont été détectées',
+                                    html: errorHtml,
+                                    icon: 'error',
+                                    confirmButtonColor: '#ef4444',
+                                    confirmButtonText: 'OK',
+                                    allowOutsideClick: false,
+                                    allowEscapeKey: false,
+                                });
+                            } else if (typeof alert !== 'undefined') {
+                                alert('Erreurs: ' + errors.join('\n'));
+                            }
+                        })();
+                    </script>
                 @endif
 
                 @yield('content')
@@ -200,7 +330,7 @@
                     </a>
                 </div>
     </footer>
-    
+
 </body>
 
 </html>

@@ -53,7 +53,7 @@ class Contrat extends Model
         'date_signature' => 'date',
         'date_etat_lieux_entree' => 'date',
         'date_etat_lieux_sortie' => 'date',
-        'date_resiliation' => 'date',
+        'date_resiliation' => 'datetime',
         'loyer_mensuel' => 'decimal:2',
         'caution' => 'decimal:2',
         'charges_mensuelles' => 'decimal:2',
@@ -129,6 +129,24 @@ class Contrat extends Model
         return $this->date_fin ? now()->diffInMonths($this->date_fin, false) : null;
     }
 
+    public function getDateFinFrAttribute()
+    {
+        if (!$this->date_fin) {
+            return null;
+        }
+
+        return $this->date_fin->locale('fr')->translatedFormat('d M Y');
+    }
+
+    public function getDateSignatureFrAttribute()
+    {
+        if (!$this->date_signature) {
+            return null;
+        }
+
+        return $this->date_signature->locale('fr')->translatedFormat('d MMMM Y');
+    }
+
     // Scopes
     public function scopeActifs($query)
     {
@@ -188,6 +206,15 @@ class Contrat extends Model
         return $this->statut === 'resilie';
     }
 
+    public function getDateResiliationFrAttribute()
+    {
+        if (!$this->date_resiliation) {
+            return null;
+        }
+
+        return $this->date_resiliation->locale('fr')->translatedFormat('d M Y');
+    }
+
     public function prochEcheanceRenouvellement()
     {
         if (!$this->estActif()) {
@@ -202,9 +229,42 @@ class Contrat extends Model
 
     public function genererNumero()
     {
-        $lastContrat = static::orderBy('id', 'desc')->first();
-        $number = $lastContrat ? $lastContrat->id + 1 : 1;
-        return 'CONT-' . date('Y') . '-' . str_pad($number, 4, '0', STR_PAD_LEFT);
+        $year = date('Y');
+        $maxAttempts = 100;
+        $attempt = 0;
+
+        do {
+            // Récupérer le dernier numéro de l'année courante (incluant les soft deletes)
+            $lastNumero = static::withTrashed()
+                ->where('numero', 'like', "CONT-{$year}-%")
+                ->orderByRaw("CAST(SUBSTRING_INDEX(numero, '-', -1) AS UNSIGNED) DESC")
+                ->value('numero');
+
+            // Extraire le numéro séquentiel
+            if ($lastNumero) {
+                preg_match('/CONT-\d+-(\d+)$/', $lastNumero, $matches);
+                $number = isset($matches[1]) ? (int)$matches[1] + 1 : 1;
+            } else {
+                $number = 1;
+            }
+
+            $numero = 'CONT-' . $year . '-' . str_pad($number, 4, '0', STR_PAD_LEFT);
+            $attempt++;
+
+            // Vérifier que ce numéro n'existe pas (y compris les soft deleted)
+            $exists = static::withTrashed()
+                ->where('numero', $numero)
+                ->exists();
+
+            if (!$exists) {
+                return $numero;
+            }
+
+            // Incrémenter et réessayer
+            $number++;
+        } while ($attempt < $maxAttempts);
+
+        throw new \Exception('Impossible de générer un numéro de contrat unique après ' . $maxAttempts . ' tentatives');
     }
 
     public function calculerDuree()
@@ -222,7 +282,32 @@ class Contrat extends Model
 
         static::creating(function ($contrat) {
             if (empty($contrat->numero)) {
-                $contrat->numero = $contrat->genererNumero();
+                $maxAttempts = 5;
+                $attempt = 0;
+                $numero = null;
+
+                // Réessayer jusqu'à 5 fois en cas de conflit
+                do {
+                    $numero = $contrat->genererNumero();
+                    
+                    // Vérifier qu'aucun autre contrat ne porte ce numéro
+                    $exists = static::where('numero', $numero)->exists();
+                    
+                    if (!$exists) {
+                        $contrat->numero = $numero;
+                        break;
+                    }
+                    
+                    $attempt++;
+                    if ($attempt < $maxAttempts) {
+                        // Attendre un peu avant de réessayer
+                        usleep(rand(100, 500) * 1000); // 100-500ms
+                    }
+                } while ($attempt < $maxAttempts);
+
+                if ($attempt >= $maxAttempts) {
+                    throw new \Exception('Impossible de générer un numéro de contrat unique après ' . $maxAttempts . ' tentatives');
+                }
             }
             
             if ($contrat->date_debut && $contrat->date_fin && !$contrat->duree_mois) {

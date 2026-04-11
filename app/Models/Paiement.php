@@ -20,6 +20,8 @@ class Paiement extends Model
         'periode_debut',
         'periode_fin',
         'mois_annee',
+        'type_selection',
+        'mois_concernes',
         'montant_du',
         'montant_paye',
         'reste_a_payer',
@@ -40,19 +42,20 @@ class Paiement extends Model
     ];
 
     protected $casts = [
-        'periode_debut' => 'date',
-        'periode_fin' => 'date',
-        'date_echeance' => 'date',
-        'date_paiement' => 'date',
+        'periode_debut'             => 'date',
+        'periode_fin'               => 'date',
+        'date_echeance'             => 'date',
+        'date_paiement'             => 'date',
         'date_generation_quittance' => 'date',
-        'montant_du' => 'decimal:2',
-        'montant_paye' => 'decimal:2',
-        'reste_a_payer' => 'decimal:2',
-        'penalite' => 'decimal:2',
-        'quittance_generee' => 'boolean',
+        'montant_du'                => 'decimal:2',
+        'montant_paye'              => 'decimal:2',
+        'reste_a_payer'             => 'decimal:2',
+        'penalite'                  => 'decimal:2',
+        'quittance_generee'         => 'boolean',
+        'mois_concernes'            => 'array',
     ];
 
-    // Relations
+    // ─── Relations ──────────────────────────────────────────
     public function contrat()
     {
         return $this->belongsTo(Contrat::class);
@@ -73,7 +76,7 @@ class Paiement extends Model
         return $this->belongsTo(User::class, 'gestionnaire_id');
     }
 
-    // Accesseurs
+    // ─── Accesseurs ─────────────────────────────────────────
     public function getMontantDuFormatAttribute()
     {
         return number_format($this->montant_du, 0, ',', ' ') . ' FCFA';
@@ -89,38 +92,15 @@ class Paiement extends Model
         return number_format($this->reste_a_payer, 0, ',', ' ') . ' FCFA';
     }
 
-    public function getPenaliteFormatAttribute()
-    {
-        return number_format($this->penalite, 0, ',', ' ') . ' FCFA';
-    }
-
-    public function getTypeLibelleAttribute()
-    {
-        $types = [
-            'loyer' => 'Loyer',
-            'caution' => 'Caution',
-            'charges' => 'Charges',
-            'eau' => 'Eau',
-            'electricite' => 'Électricité',
-            'frais_agence' => 'Frais d\'agence',
-            'reparation' => 'Réparation',
-            'penalite' => 'Pénalité',
-            'autre' => 'Autre',
-        ];
-        
-        return $types[$this->type] ?? $this->type;
-    }
-
     public function getStatutLibelleAttribute()
     {
         $statuts = [
             'en_attente' => 'En attente',
-            'paye' => 'Payé',
-            'partiel' => 'Paiement partiel',
-            'retard' => 'En retard',
-            'annule' => 'Annulé',
+            'paye'       => 'Payé',
+            'partiel'    => 'Paiement partiel',
+            'retard'     => 'En retard',
+            'annule'     => 'Annulé',
         ];
-        
         return $statuts[$this->statut] ?? $this->statut;
     }
 
@@ -128,133 +108,72 @@ class Paiement extends Model
     {
         $classes = [
             'en_attente' => 'bg-yellow-100 text-yellow-800',
-            'paye' => 'bg-green-100 text-green-800',
-            'partiel' => 'bg-blue-100 text-blue-800',
-            'retard' => 'bg-red-100 text-red-800',
-            'annule' => 'bg-gray-100 text-gray-800',
+            'paye'       => 'bg-green-100 text-green-800',
+            'partiel'    => 'bg-blue-100 text-blue-800',
+            'retard'     => 'bg-red-100 text-red-800',
+            'annule'     => 'bg-gray-100 text-gray-800',
         ];
-        
         return $classes[$this->statut] ?? 'bg-gray-100 text-gray-800';
     }
+    
+    public function getEstEnRetardAttribute(): bool
+    {
+        if (!$this->date_paiement || !$this->contrat) return false;
 
-    // Scopes
+        $jourPaiement = $this->contrat->jour_paiement ?? 5;
+        // Date limite = jour_paiement du mois concerné
+        $dateLimite = \Carbon\Carbon::parse($this->periode_debut)
+            ->setDay(min($jourPaiement, \Carbon\Carbon::parse($this->periode_debut)->daysInMonth));
+
+        return $this->date_paiement->gt($dateLimite);
+    }
+
+    // ─── Scopes ─────────────────────────────────────────────
     public function scopeEnAttente($query)
     {
         return $query->where('statut', 'en_attente');
     }
-
     public function scopePayes($query)
     {
         return $query->where('statut', 'paye');
     }
-
     public function scopeEnRetard($query)
     {
         return $query->where('statut', 'retard');
     }
-
     public function scopePartiels($query)
     {
         return $query->where('statut', 'partiel');
     }
 
-    public function scopeParType($query, $type)
-    {
-        return $query->where('type', $type);
-    }
-
-    public function scopeLoyers($query)
-    {
-        return $query->where('type', 'loyer');
-    }
-
-    public function scopeParMois($query, $mois, $annee = null)
-    {
-        if ($annee) {
-            return $query->where('mois_annee', "{$mois} {$annee}");
-        }
-        return $query->where('mois_annee', 'like', "{$mois}%");
-    }
-
-    public function scopeParAnnee($query, $annee)
-    {
-        return $query->where('mois_annee', 'like', "%{$annee}");
-    }
-
     public function scopeRecherche($query, $search)
     {
-        return $query->where(function($q) use ($search) {
+        return $query->where(function ($q) use ($search) {
             $q->where('numero', 'like', "%{$search}%")
-              ->orWhere('reference_paiement', 'like', "%{$search}%")
-              ->orWhereHas('locataire', function($q) use ($search) {
-                  $q->where('nom', 'like', "%{$search}%")
-                    ->orWhere('prenoms', 'like', "%{$search}%");
-              });
+                ->orWhereHas('locataire', function ($q) use ($search) {
+                    $q->where('nom', 'like', "%{$search}%")
+                        ->orWhere('prenoms', 'like', "%{$search}%");
+                });
         });
     }
 
-    // Méthodes
+    // ─── Méthodes ───────────────────────────────────────────
     public function estPaye()
     {
         return $this->statut === 'paye';
     }
 
-    public function estEnRetard()
-    {
-        return $this->statut === 'retard' || 
-               (!$this->estPaye() && $this->date_echeance && $this->date_echeance->isPast());
-    }
-
     public function calculerJoursRetard()
     {
-        if ($this->estPaye() || !$this->date_echeance) {
+        if (!$this->date_echeance || !$this->date_paiement) {
             return 0;
         }
-        
-        $datePaiement = $this->date_paiement ?? now();
-        
-        if ($datePaiement->gt($this->date_echeance)) {
-            return $this->date_echeance->diffInDays($datePaiement);
-        }
-        
-        return 0;
-    }
 
-    public function calculerPenalite($tauxParJour = 100)
-    {
-        $joursRetard = $this->calculerJoursRetard();
-        
-        if ($joursRetard > 0) {
-            return $joursRetard * $tauxParJour;
+        if ($this->date_paiement->lte($this->date_echeance)) {
+            return 0;
         }
-        
-        return 0;
-    }
 
-    public function marquerCommePaye($montant = null, $modePaiement = null, $reference = null)
-    {
-        $this->montant_paye = $montant ?? $this->montant_du;
-        $this->date_paiement = now();
-        $this->mode_paiement = $modePaiement ?? $this->mode_paiement;
-        $this->reference_paiement = $reference;
-        
-        $this->reste_a_payer = $this->montant_du - $this->montant_paye;
-        
-        if ($this->reste_a_payer <= 0) {
-            $this->statut = 'paye';
-        } else {
-            $this->statut = 'partiel';
-        }
-        
-        // Calculer les pénalités
-        $this->jours_retard = $this->calculerJoursRetard();
-        if ($this->jours_retard > 0) {
-            $this->penalite = $this->calculerPenalite();
-        }
-        
-        $this->save();
-        
-        return $this;
+        return $this->date_echeance->diffInDays($this->date_paiement);
     }
 
     public function genererNumero()
@@ -267,20 +186,17 @@ class Paiement extends Model
     public function genererNumeroQuittance()
     {
         $year = date('Y');
-        $lastQuittance = static::whereNotNull('numero_quittance')
-                              ->where('numero_quittance', 'like', "QUI-{$year}%")
-                              ->orderBy('id', 'desc')
-                              ->first();
-        
+        $last = static::whereNotNull('numero_quittance')
+            ->where('numero_quittance', 'like', "QUI-{$year}%")
+            ->orderBy('id', 'desc')->first();
         $number = 1;
-        if ($lastQuittance && preg_match('/QUI-\d{4}-(\d+)/', $lastQuittance->numero_quittance, $matches)) {
-            $number = intval($matches[1]) + 1;
+        if ($last && preg_match('/QUI-\d{4}-(\d+)/', $last->numero_quittance, $m)) {
+            $number = intval($m[1]) + 1;
         }
-        
         return 'QUI-' . $year . '-' . str_pad($number, 4, '0', STR_PAD_LEFT);
     }
 
-    // Boot method
+    // ─── Boot ───────────────────────────────────────────────
     protected static function boot()
     {
         parent::boot();
@@ -289,19 +205,37 @@ class Paiement extends Model
             if (empty($paiement->numero)) {
                 $paiement->numero = $paiement->genererNumero();
             }
-            
-            if ($paiement->montant_paye) {
-                $paiement->reste_a_payer = $paiement->montant_du - $paiement->montant_paye;
-            } else {
-                $paiement->reste_a_payer = $paiement->montant_du;
+
+            $paiement->reste_a_payer = max(
+                0,
+                $paiement->montant_du - ($paiement->montant_paye ?? 0)
+            );
+
+            // Générer quittance automatiquement pour paiement payé en totalité
+            if ($paiement->statut === 'paye' && empty($paiement->numero_quittance)) {
+                $paiement->quittance_generee = true;
+                $paiement->numero_quittance = $paiement->genererNumeroQuittance();
+                $paiement->date_generation_quittance = now()->toDateString();
             }
+
+            // Met à jour le retard si date paiement dépassée
+            $paiement->jours_retard = $paiement->calculerJoursRetard();
         });
 
         static::updating(function ($paiement) {
-            // Vérifier le retard
-            if (!$paiement->estPaye() && $paiement->date_echeance && $paiement->date_echeance->isPast()) {
+            // Si le paiement devient paye, générer une quittance si elle n'existe pas encore
+            if ($paiement->isDirty('statut') && $paiement->statut === 'paye' && empty($paiement->numero_quittance)) {
+                $paiement->quittance_generee = true;
+                $paiement->numero_quittance = $paiement->genererNumeroQuittance();
+                $paiement->date_generation_quittance = now()->toDateString();
+            }
+
+            // Calcule toujours le retard dès qu’on a une date de paiement + échéance
+            $paiement->jours_retard = $paiement->calculerJoursRetard();
+
+            // Si pas payé encore et échéance dépassée, on marque retard
+            if (!$paiement->estPaye() && $paiement->date_paiement && $paiement->date_paiement->gt($paiement->date_echeance)) {
                 $paiement->statut = 'retard';
-                $paiement->jours_retard = $paiement->calculerJoursRetard();
             }
         });
     }

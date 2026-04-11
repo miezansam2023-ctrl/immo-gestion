@@ -30,10 +30,11 @@ class RegisteredUserController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            // On remplace 'name' par 'nom' et 'prenoms'
+
             'nom' => ['required', 'string', 'max:255'],
             'prenoms' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
+            'telephone' => ['required', 'string', 'max:20'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
@@ -41,8 +42,9 @@ class RegisteredUserController extends Controller
             'nom' => $request->nom,
             'prenoms' => $request->prenoms,
             'email' => $request->email,
+            'telephone' => $request->telephone,
             'password' => Hash::make($request->password),
-            'role' => 'gestionnaire', // Valeur par défaut pour ton appli
+            'role' => 'gestionnaire', // Valeur par défaut pour le rôle
             'actif' => true,
         ]);
 

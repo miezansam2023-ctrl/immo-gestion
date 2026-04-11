@@ -27,7 +27,7 @@ class LocataireController extends Controller
         // On charge les contrats pour éviter le problème N+1 (performance)
         $locataires = $query->with('contrats.bien')
             ->latest()
-            ->paginate(12)
+            ->paginate(10)
             ->withQueryString();
 
         return view('locataires.index', compact('locataires'));

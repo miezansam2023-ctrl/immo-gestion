@@ -16,8 +16,11 @@ class User extends Authenticatable
         'email',
         'telephone',
         'password',
-        'role',
-        'actif',
+        // 'role',
+        // 'actif',
+        // 'deactivated_at',
+        // 'deactivated_by',
+        // 'last_login',
     ];
 
     protected $hidden = [
@@ -31,10 +34,17 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'actif' => 'boolean',
+            'deactivated_at' => 'datetime',
+            'last_login' => 'datetime',
         ];
     }
 
     // Relations
+    public function deactivatedBy()
+    {
+        return $this->belongsTo(User::class, 'deactivated_by');
+    }
+
     public function biens()
     {
         return $this->hasMany(Bien::class, 'gestionnaire_id');

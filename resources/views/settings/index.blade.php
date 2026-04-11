@@ -15,7 +15,7 @@
                 </p>
             </div>
 
-            <div
+            {{-- <div
                 class="flex items-center bg-white border border-gray-100 px-4 py-2 rounded-2xl shadow-sm self-start md:self-center">
                 <div class="flex items-center justify-center w-6 h-6 bg-indigo-50 rounded-lg mr-3">
                     <i class="fas fa-history text-[10px] text-indigo-400"></i>
@@ -24,11 +24,6 @@
                     <h4 class="text-[8px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">
                         Dernière mise à jour
                     </h4>
-
-                    {{-- <span class="text-[10px] font-black text-indigo-600 uppercase leading-none">
-                        {{ auth()->user()->updated_at ? auth()->user()->updated_at->diffForHumans() : 'Jamais' }}, 
-                        {{ auth()->user()->updated_at ? auth()->user()->updated_at->translatedFormat('d F Y à H\hi') : 'Jamais' }}
-                    </span> --}}
                     
                     <span class="text-[10px] font-black text-indigo-600 uppercase leading-none">
                         @if (auth()->user()->updated_at)
@@ -49,7 +44,7 @@
                         @endif
                     </span>
                 </div>
-            </div>
+            </div> --}}
         </div>
 
         <div class="flex flex-col md:flex-row gap-8">

@@ -49,7 +49,7 @@
                             @csrf
                             <x-dropdown-link :href="route('logout')"
                                     class="text-xs font-bold uppercase tracking-wide text-red-600 hover:bg-red-50"
-                                    onclick="event.preventDefault(); this.closest('form').submit();">
+                                    onclick="event.preventDefault(); confirmLogout().then(confirmed => { if(confirmed) this.closest('form').submit(); })">    
                                 {{ __('Déconnexion') }}
                             </x-dropdown-link>
                         </form>
@@ -97,7 +97,7 @@
                     @csrf
                     <x-responsive-nav-link :href="route('logout')"
                             class="rounded-xl font-bold uppercase text-[10px] text-red-600"
-                            onclick="event.preventDefault(); this.closest('form').submit();">
+                            onclick="event.preventDefault(); confirmLogout().then(confirmed => { if(confirmed) this.closest('form').submit(); })">    
                         {{ __('Déconnexion') }}
                     </x-responsive-nav-link>
                 </form>

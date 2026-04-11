@@ -18,21 +18,8 @@
         </div>
     </div>
 
-    {{-- Affichage des erreurs --}}
-    @if ($errors->any())
-    <div class="bg-red-50 border-l-4 border-red-500 p-6 rounded-[2rem] shadow-sm flex justify-between animate-in fade-in slide-in-from-top-4">
-        <div>
-            <h3 class="text-xs font-black text-red-800 uppercase italic mb-2">Erreurs de validation :</h3>
-            <ul class="text-[10px] text-red-700 list-disc list-inside font-bold space-y-1">
-                @foreach ($errors->all() as $error) <li>{{ $error }}</li> @endforeach
-            </ul>
-        </div>
-        <i class="fas fa-exclamation-triangle text-red-500 text-2xl"></i>
-    </div>
-    @endif
-
     <div class="bg-white rounded-[3rem] p-10 shadow-sm border border-gray-100 relative overflow-hidden">
-        {{-- Décoration subtile --}}
+
         <div class="absolute top-0 right-0 w-64 h-64 bg-amber-50/50 blur-[80px] rounded-full -mr-32 -mt-32"></div>
 
         <div class="relative z-10 mb-10 border-b pb-8 flex justify-between items-end">
@@ -105,7 +92,7 @@
                             <label class="relative flex items-center cursor-pointer">
                                 <select name="statut" class="appearance-none bg-white border-none rounded-xl py-2 px-8 font-black text-[10px] uppercase tracking-widest text-indigo-600 shadow-sm focus:ring-2 focus:ring-indigo-500">
                                     <option value="actif" {{ $contrat->statut == 'actif' ? 'selected' : '' }}>ACTIF</option>
-                                    <option value="suspendu" {{ $contrat->statut == 'suspendu' ? 'selected' : '' }}>SUSPENDU</option>
+                                    {{-- <option value="suspendu" {{ $contrat->statut == 'suspendu' ? 'selected' : '' }}>SUSPENDU</option> --}}
                                     <option value="resilie" {{ $contrat->statut == 'resilie' ? 'selected' : '' }}>RÉSILIÉ</option>
                                 </select>
                                 <div class="absolute right-3 pointer-events-none text-[8px] text-indigo-400">
@@ -129,12 +116,12 @@
                     </div>
                     <div>
                         <label class="block text-[10px] font-black text-gray-400 uppercase mb-2">Observations État des lieux</label>
-                        <textarea name="etat_des_lieux_entree" rows="2" class="w-full bg-white border-none rounded-xl p-4 font-medium text-sm shadow-sm" placeholder="Observations sur l'état général du bien lors de l'édition...">{{ old('etat_des_lieux_entree', $contrat->etat_des_lieux_entree) }}</textarea>
+                        <textarea name="etat_lieux_entree" rows="2" class="w-full bg-white border-none rounded-xl p-4 font-medium text-sm shadow-sm" placeholder="Observations sur l'état général du bien lors de l'édition...">{{ old('etat_lieux_entree', $contrat->etat_lieux_entree) }}</textarea>
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-[10px] font-black text-gray-400 uppercase mb-2 ml-1">Notes administratives (Interne)</label>
+                    <label class="block text-[10px] font-black text-gray-400 uppercase mb-2 ml-1">Notes </label>
                     <textarea name="notes" rows="3" class="w-full bg-gray-50 border-none rounded-[1.5rem] p-6 font-medium text-sm" placeholder="Ajoutez ici les modifications apportées ou notes spécifiques...">{{ old('notes', $contrat->notes) }}</textarea>
                 </div>
             </div>
@@ -158,7 +145,7 @@
                             <input type="number" name="caution" value="{{ old('caution', $contrat->caution) }}" class="w-full bg-white/5 border-none rounded-xl py-3 px-4 text-xl font-bold" required>
                         </div>
                         <div>
-                            <label class="block text-[9px] font-black uppercase opacity-40 mb-1">Frais d'agence / Dossier</label>
+                            <label class="block text-[9px] font-black uppercase opacity-40 mb-1">Frais d'agence </label>
                             <input type="number" step="0.01" name="frais_agence"
                                 value="{{ old('frais_agence', $contrat->frais_agence) }}"
                                 class="w-full bg-white/5 border-none rounded-xl py-3 px-4 text-xl font-bold">
@@ -170,10 +157,11 @@
                             <input type="checkbox" name="renouvellement_automatique" value="1" {{ $contrat->renouvellement_automatique ? 'checked' : '' }} class="w-6 h-6 rounded-lg border-none bg-white/10 text-amber-500 focus:ring-0">
                             <span class="text-[11px] font-bold uppercase tracking-tight">Tacite Reconduction</span>
                         </label>
-                        <!-- <label class="flex items-center space-x-3 cursor-pointer group p-3 rounded-2xl hover:bg-white/5 transition">
+                        
+                        <label class="flex items-center space-x-3 cursor-pointer group p-3 rounded-2xl hover:bg-white/5 transition">
                             <input type="checkbox" name="animaux_autorises" value="1" {{ $contrat->animaux_autorises ? 'checked' : '' }} class="w-6 h-6 rounded-lg border-none bg-white/10 text-amber-500 focus:ring-0">
                             <span class="text-[11px] font-bold uppercase tracking-tight">Animaux Autorisés</span>
-                        </label> -->
+                        </label> 
                     </div>
                 </div>
 

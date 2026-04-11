@@ -1,3 +1,8 @@
+# Bloquer l'accès à ce fichier lui-même
+<Files ".htaccess">
+    Require all denied
+</Files>
+
 <IfModule mod_rewrite.c>
     <IfModule mod_negotiation.c>
         Options -MultiViews -Indexes
@@ -23,3 +28,4 @@
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
 </IfModule>
+ 

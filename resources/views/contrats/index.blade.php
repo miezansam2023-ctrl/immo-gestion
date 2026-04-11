@@ -57,20 +57,6 @@
             </button>
         </div>
 
-        {{-- 2. ALERTES DYNAMIQUES --}}
-        {{-- @if (session('success'))
-            <div id="alert-success"
-                class="flex items-center justify-between bg-emerald-50 border-l-4 border-emerald-500 p-4 rounded-2xl shadow-sm">
-                <div class="flex items-center">
-                    <i class="fas fa-check-circle text-emerald-500 text-xl"></i>
-                    <div class="ml-3 text-emerald-800 font-black uppercase text-[10px] tracking-widest">
-                        {{ session('success') }}</div>
-                </div>
-                <button onclick="this.parentElement.remove()"
-                    class="text-emerald-500 hover:rotate-90 transition-transform"><i class="fas fa-times"></i></button>
-            </div>
-        @endif --}}
-
         {{-- 3. REGISTRE DES CONTRATS (TABLEAU PRINCIPAL) --}}
         <div class="bg-white rounded-[3rem] shadow-sm border border-gray-100 overflow-hidden">
             <div class="overflow-x-auto">
@@ -114,8 +100,8 @@
                                     <div class="space-y-1">
                                         <div class="flex items-center text-gray-900">
                                             <i class="fas fa-user-circle mr-2 text-gray-400 text-xs"></i>
-                                            <span class="font-black uppercase text-xs">{{ $contrat->locataire->nom }}
-                                                {{ $contrat->locataire->prenoms }}</span>
+                                            <span
+                                                class="font-black uppercase text-xs">{{ $contrat->locataire->nom }}{{ $contrat->locataire->prenoms }}</span>
                                         </div>
                                         <div
                                             class="flex items-center text-[10px] text-gray-400 font-bold uppercase tracking-tight ml-5">
@@ -129,7 +115,7 @@
                                     <div
                                         class="inline-block px-5 py-3 rounded-[1.5rem] bg-white border border-gray-100 shadow-sm group-hover:border-indigo-200 transition-colors">
                                         <span
-                                            class="block text-xs font-black text-gray-800 mb-1">{{ $contrat->date_fin->format('d M Y') }}</span>
+                                            class="block text-xs font-black text-gray-800 mb-1">{{ $contrat->date_fin_fr }}</span>
                                         <div class="flex items-center justify-center gap-1.5">
                                             <span
                                                 class="w-1.5 h-1.5 rounded-full {{ $contrat->jours_restants < 30 ? 'bg-red-500 animate-pulse' : 'bg-emerald-500' }}"></span>
@@ -145,7 +131,7 @@
                                 <td class="p-8">
                                     <div class="bg-indigo-50/50 p-3 rounded-2xl border border-indigo-100/50">
                                         <div class="font-black text-indigo-600 text-[13px] flex items-baseline gap-1">
-                                            {{ number_format($contrat->loyer_mensuel, 0, ',', ' ') }}
+                                            LOYER: {{ number_format($contrat->loyer_mensuel, 0, ',', ' ') }} 
                                             <span class="text-[8px] uppercase">CFA / mois</span>
                                         </div>
                                         <div class="flex gap-3 mt-1 px-1">
@@ -175,7 +161,7 @@
                                             <i class="fas fa-edit"></i>
                                         </a>
                                         <form action="{{ route('contrats.destroy', $contrat->id) }}" method="POST"
-                                            class="inline" onsubmit="return confirm('Annuler ce bail ?')">
+                                            class="inline" onsubmit="event.preventDefault(); confirmDelete('Êtes-vous sûr de vouloir annuler ce bail ?').then(confirmed => { if(confirmed) this.submit(); })">
                                             @csrf @method('DELETE')
                                             <button type="submit"
                                                 class="w-10 h-10 flex items-center justify-center bg-gray-50 text-gray-300 rounded-xl hover:bg-red-600 hover:text-white transition-all shadow-sm">
@@ -186,10 +172,12 @@
                                 </td>
                             </tr>
                         @empty
-                            
                         @endforelse
                     </tbody>
                 </table>
+            </div>
+            <div class="p-6 bg-gray-50 border-t border-gray-100">
+                {{ $contrats->links() }}
             </div>
         </div>
 
@@ -198,15 +186,21 @@
             <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity"
                 onclick="document.getElementById('modal-contrat').classList.add('hidden')"></div>
 
-            <div class="relative min-h-screen flex items-center justify-center p-4">
+            <div class="relative min-h-screen flex items-start justify-center p-4 py-8">
                 <div
                     class="relative bg-white w-full max-w-6xl rounded-[3rem] shadow-2xl overflow-hidden flex flex-col md:flex-row">
 
-                    {{-- Formulaire (Gauche 8/12) --}}
-                    <div class="flex-1 p-8 md:p-12 overflow-y-auto max-h-[90vh]">
-                        <div class="flex justify-between items-center mb-10">
-                            <h2 class="text-3xl font-black text-gray-900 uppercase tracking-tighter italic">Nouveau Bail
-                            </h2>
+                    {{-- FORMULAIRE GAUCHE --}}
+                    <div class="flex-1 overflow-y-auto max-h-[90vh]">
+
+                        {{-- Header --}}
+                        <div
+                            class="sticky top-0 z-10 bg-white px-10 py-6 border-b border-gray-100 flex justify-between items-center">
+                            <div>
+                                <h2 class="text-2xl font-black text-gray-900 uppercase tracking-tighter">Nouveau Bail</h2>
+                                <p class="text-indigo-500 text-[9px] font-black uppercase tracking-widest">Remplir tous les
+                                    champs obligatoires *</p>
+                            </div>
                             <button onclick="document.getElementById('modal-contrat').classList.add('hidden')"
                                 class="text-gray-400 hover:text-red-500 transition-colors">
                                 <i class="fas fa-times-circle text-2xl"></i>
@@ -214,153 +208,296 @@
                         </div>
 
                         <form action="{{ route('contrats.store') }}" method="POST" id="form-contrat"
-                            class="space-y-10">
+                            class="p-10 space-y-8">
                             @csrf
-                            {{-- Section Identification --}}
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <label
-                                        class="block text-[10px] font-black text-gray-400 uppercase mb-2 ml-1 tracking-widest">Bien
-                                        Immobilier *</label>
-                                    <select name="bien_id" id="bien_selector"
-                                        class="w-full bg-gray-50 border-none focus:ring-2 focus:ring-indigo-500 rounded-2xl py-4 px-5 font-bold text-gray-700 transition-all"
-                                        required>
-                                        <option value="">Sélectionner...</option>
-                                        @foreach ($biens as $bien)
-                                            <option value="{{ $bien->id }}" data-loyer="{{ $bien->prix_loyer }}"
-                                                data-caution="{{ $bien->prix_caution }}">
-                                                {{ $bien->reference }} - {{ $bien->titre }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <div>
-                                    <label
-                                        class="block text-[10px] font-black text-gray-400 uppercase mb-2 ml-1 tracking-widest">Locataire
-                                        *</label>
-                                    <select name="locataire_id"
-                                        class="w-full bg-gray-50 border-none focus:ring-2 focus:ring-indigo-500 rounded-2xl py-4 px-5 font-bold text-gray-700 transition-all"
-                                        required>
-                                        <option value="">Sélectionner...</option>
-                                        @foreach ($locataires as $locataire)
-                                            <option value="{{ $locataire->id }}">{{ $locataire->nom }}
-                                                {{ $locataire->prenoms }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
+                            <input type="hidden" name="date_signature" value="{{ date('Y-m-d') }}">
 
-                            {{-- Section Dates --}}
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                <div>
-                                    <label
-                                        class="block text-[10px] font-black text-gray-400 uppercase mb-2 tracking-widest">Date
-                                        Début *</label>
-                                    <input type="date" name="date_debut"
-                                        class="w-full bg-gray-50 border-none rounded-2xl py-4 px-5 font-bold" required>
-                                </div>
-                                <div>
-                                    <label
-                                        class="block text-[10px] font-black text-gray-400 uppercase mb-2 tracking-widest">Durée
-                                        (Mois) *</label>
-                                    <input type="number" name="duree_mois" value="12"
-                                        class="w-full bg-gray-50 border-none rounded-2xl py-4 px-5 font-bold" required>
-                                </div>
-                                <div>
-                                    <label
-                                        class="block text-[10px] font-black text-gray-400 uppercase mb-2 tracking-widest">Mode
-                                        Règlement *</label>
-                                    <select name="mode_paiement"
-                                        class="w-full bg-gray-50 border-none rounded-2xl py-4 px-5 font-bold text-gray-700"
-                                        required>
-                                        <option value="Espèces">Espèces</option>
-                                        <option value="Virement">Virement</option>
-                                        <option value="Mobile Money">Mobile Money</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            {{-- Section État des lieux --}}
-                            <div class="bg-indigo-50/50 p-8 rounded-[2.5rem] space-y-4">
+                            {{-- SECTION 1 : PARTIES --}}
+                            <div class="bg-white border border-gray-100 rounded-[2.5rem] p-8 shadow-sm">
+                                <h3
+                                    class="text-[10px] font-black text-indigo-600 uppercase tracking-widest mb-6 flex items-center gap-3">
+                                    <span class="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center"><i
+                                            class="fas fa-handshake text-indigo-500"></i></span>
+                                    Parties du Contrat
+                                </h3>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <input type="date" name="date_signature" value="{{ date('Y-m-d') }}"
-                                        class="hidden">
                                     <div>
                                         <label
-                                            class="block text-[10px] font-black text-gray-400 uppercase mb-2 tracking-widest">Commentaire
-                                            Entrée</label>
-                                        <textarea name="etat_des_lieux_entree" rows="2"
-                                            class="w-full bg-white border-none rounded-2xl p-4 font-medium text-sm shadow-sm" placeholder="Observations..."></textarea>
+                                            class="block text-[10px] font-black text-gray-400 uppercase mb-2 tracking-widest">Bien
+                                            Immobilier *</label>
+                                        <div class="relative">
+                                            <select name="bien_id" id="bien_selector"
+                                                class="w-full bg-gray-50 border-none focus:ring-2 focus:ring-indigo-500 rounded-2xl py-4 px-5 font-bold text-gray-700 appearance-none"
+                                                required>
+                                                <option value="">Sélectionner un bien...</option>
+                                                @foreach ($biens as $bien)
+                                                    <option value="{{ $bien->id }}"
+                                                        data-loyer="{{ $bien->prix_loyer }}"
+                                                        data-caution="{{ $bien->prix_caution }}">
+                                                        {{ $bien->reference }} — {{ $bien->titre }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            <div
+                                                class="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                                                <i class="fas fa-chevron-down text-xs"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label
+                                            class="block text-[10px] font-black text-gray-400 uppercase mb-2 tracking-widest">Locataire
+                                            *</label>
+                                        <div class="relative">
+                                            <select name="locataire_id"
+                                                class="w-full bg-gray-50 border-none focus:ring-2 focus:ring-indigo-500 rounded-2xl py-4 px-5 font-bold text-gray-700 appearance-none"
+                                                required>
+                                                <option value="">Sélectionner un locataire...</option>
+                                                @foreach ($locataires as $locataire)
+                                                    <option value="{{ $locataire->id }}">
+                                                        {{ $locataire->nom }} {{ $locataire->prenoms }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            <div
+                                                class="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                                                <i class="fas fa-chevron-down text-xs"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- SECTION 2 : DATES & DURÉE --}}
+                            <div class="bg-white border border-gray-100 rounded-[2.5rem] p-8 shadow-sm">
+                                <h3
+                                    class="text-[10px] font-black text-indigo-600 uppercase tracking-widest mb-6 flex items-center gap-3">
+                                    <span class="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center"><i
+                                            class="fas fa-calendar-alt text-indigo-500"></i></span>
+                                    Période & Durée
+                                </h3>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    <div>
+                                        <label
+                                            class="block text-[10px] font-black text-gray-400 uppercase mb-2 tracking-widest">Date
+                                            de début *</label>
+                                        <input type="date" name="date_debut"
+                                            class="w-full bg-gray-50 border-none rounded-2xl py-4 px-5 font-bold text-gray-700 focus:ring-2 focus:ring-indigo-500"
+                                            required>
+                                    </div>
+                                    <div>
+                                        <label
+                                            class="block text-[10px] font-black text-gray-400 uppercase mb-2 tracking-widest">Durée
+                                            (mois) *</label>
+                                        <input type="number" name="duree_mois" value="12" min="1"
+                                            class="w-full bg-gray-50 border-none rounded-2xl py-4 px-5 font-bold text-gray-700 focus:ring-2 focus:ring-indigo-500"
+                                            required>
+                                    </div>
+                                    <div>
+                                        <label
+                                            class="block text-[10px] font-black text-gray-400 uppercase mb-2 tracking-widest">Date
+                                            d'établissement</label>
+                                        <input type="date" name="date_signature" value="{{ date('Y-m-d') }}"
+                                            class="w-full bg-gray-50 border-none rounded-2xl py-4 px-5 font-bold text-gray-700 focus:ring-2 focus:ring-indigo-500">
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- SECTION 3 : CONDITIONS FINANCIÈRES --}}
+                            <div class="bg-white border border-gray-100 rounded-[2.5rem] p-8 shadow-sm">
+                                <h3
+                                    class="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-6 flex items-center gap-3">
+                                    <span class="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center"><i
+                                            class="fas fa-coins text-emerald-500"></i></span>
+                                    Conditions Financières
+                                </h3>
+                                <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                                    <div>
+                                        <label
+                                            class="block text-[10px] font-black text-gray-400 uppercase mb-2 tracking-widest">Loyer
+                                            mensuel *</label>
+                                        <div class="relative">
+                                            <input type="number" name="loyer_mensuel" id="input_loyer"
+                                                class="w-full bg-emerald-50 border-none rounded-2xl py-4 px-5 font-black text-emerald-600 text-lg focus:ring-2 focus:ring-emerald-500"
+                                                placeholder="0" required>
+                                            <span
+                                                class="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] font-black text-emerald-400 opacity-60">FCFA</span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label
+                                            class="block text-[10px] font-black text-gray-400 uppercase mb-2 tracking-widest">Caution
+                                            *</label>
+                                        <div class="relative">
+                                            <input type="number" name="caution" id="input_caution"
+                                                class="w-full bg-gray-50 border-none rounded-2xl py-4 px-5 font-bold text-gray-700 focus:ring-2 focus:ring-indigo-500"
+                                                placeholder="0" required>
+                                            <span
+                                                class="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] font-black text-gray-400 opacity-60">FCFA</span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label
+                                            class="block text-[10px] font-black text-gray-400 uppercase mb-2 tracking-widest">Frais
+                                            agence</label>
+                                        <div class="relative">
+                                            <input type="number" name="frais_agence" id="input_agence"
+                                                class="w-full bg-gray-50 border-none rounded-2xl py-4 px-5 font-bold text-gray-700 focus:ring-2 focus:ring-indigo-500"
+                                                placeholder="0">
+                                            <span
+                                                class="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] font-black text-gray-400 opacity-60">FCFA</span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label
+                                            class="block text-[10px] font-black text-gray-400 uppercase mb-2 tracking-widest">Jour
+                                            paiement *</label>
+                                        <input type="number" name="jour_paiement" value="5" min="1"
+                                            max="31"
+                                            class="w-full bg-gray-50 border-none rounded-2xl py-4 px-5 font-bold text-gray-700 focus:ring-2 focus:ring-indigo-500"
+                                            required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- SECTION 4 : MODE DE RÈGLEMENT --}}
+                            <div class="bg-white border border-gray-100 rounded-[2.5rem] p-8 shadow-sm">
+                                <h3
+                                    class="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-6 flex items-center gap-3">
+                                    <span class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center"><i
+                                            class="fas fa-credit-card text-blue-500"></i></span>
+                                    Mode de Règlement
+                                </h3>
+                                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                    @foreach ([['especes', 'fa-money-bill-wave', 'Espèces'], ['virement', 'fa-university', 'Virement'], ['cheque', 'fa-money-check', 'Chèque'], ['mobile_money', 'fa-mobile-alt', 'Mobile Money']] as [$val, $icon, $label])
+                                        <label class="relative cursor-pointer">
+                                            <input type="radio" name="mode_paiement" value="{{ $val }}"
+                                                class="peer sr-only" {{ $val === 'especes' ? 'checked' : '' }} required>
+                                            <div
+                                                class="flex flex-col items-center justify-center p-4 bg-gray-50 rounded-2xl border-2 border-transparent peer-checked:border-indigo-500 peer-checked:bg-indigo-50 transition-all">
+                                                <i
+                                                    class="fas {{ $icon }} text-gray-400 peer-checked:text-indigo-500 mb-2 text-lg"></i>
+                                                <span
+                                                    class="text-[10px] font-black uppercase text-gray-500">{{ $label }}</span>
+                                            </div>
+                                        </label>
+                                    @endforeach
+                                </div>
+                            </div>
+
+                            {{-- SECTION 5 : CLAUSES & CONDITIONS --}}
+                            <div class="bg-indigo-50/40 border border-indigo-100 rounded-[2.5rem] p-8">
+                                <h3
+                                    class="text-[10px] font-black text-indigo-600 uppercase tracking-widest mb-6 flex items-center gap-3">
+                                    <span class="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center"><i
+                                            class="fas fa-file-alt text-indigo-500"></i></span>
+                                    Clauses & Conditions
+                                </h3>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                    <div>
+                                        <label
+                                            class="block text-[10px] font-black text-gray-400 uppercase mb-2 tracking-widest">État
+                                            des lieux d'entrée</label>
+                                        <textarea name="etat_lieux_entree" rows="3"
+                                            class="w-full bg-white border-none rounded-2xl p-4 font-medium text-sm shadow-sm focus:ring-2 focus:ring-indigo-500"
+                                            placeholder="Observations sur l'état du bien à l'entrée..."></textarea>
                                     </div>
                                     <div>
                                         <label
                                             class="block text-[10px] font-black text-gray-400 uppercase mb-2 tracking-widest">Notes
-                                            Clauses</label>
-                                        <textarea name="notes" rows="2"
-                                            class="w-full bg-white border-none rounded-2xl p-4 font-medium text-sm shadow-sm"
-                                            placeholder="Clauses spécifiques..."></textarea>
+                                            / Clauses particulières</label>
+                                        <textarea name="notes" rows="3"
+                                            class="w-full bg-white border-none rounded-2xl p-4 font-medium text-sm shadow-sm focus:ring-2 focus:ring-indigo-500"
+                                            placeholder="Ex: Interdiction de fumer, jardin inclus..."></textarea>
+                                    </div>
+                                    <div>
+                                        <label
+                                            class="block text-[10px] font-black text-gray-400 uppercase mb-2 tracking-widest">Date
+                                            état des lieux</label>
+                                        <input type="date" name="date_etat_lieux_entree"
+                                            class="w-full bg-white border-none rounded-2xl py-4 px-5 font-bold text-gray-700 shadow-sm focus:ring-2 focus:ring-indigo-500">
+                                    </div>
+                                    <div class="flex flex-col gap-4 justify-center">
+                                        <label
+                                            class="flex items-center gap-3 cursor-pointer p-4 bg-white rounded-2xl shadow-sm hover:bg-indigo-50 transition-all">
+                                            <input type="checkbox" name="renouvellement_automatique" value="1"
+                                                class="w-5 h-5 rounded text-indigo-500 focus:ring-0 border-gray-200">
+                                            <span
+                                                class="text-[10px] font-black uppercase text-gray-600 tracking-widest">Renouvellement
+                                                automatique</span>
+                                        </label>
+                                        <label
+                                            class="flex items-center gap-3 cursor-pointer p-4 bg-white rounded-2xl shadow-sm hover:bg-indigo-50 transition-all">
+                                            <input type="checkbox" name="animaux_autorises" value="1"
+                                                class="w-5 h-5 rounded text-indigo-500 focus:ring-0 border-gray-200">
+                                            <span
+                                                class="text-[10px] font-black uppercase text-gray-600 tracking-widest">Animaux
+                                                autorisés</span>
+                                        </label>
                                     </div>
                                 </div>
                             </div>
+
                         </form>
                     </div>
 
-                    {{-- Sidebar Finances (Droite 4/12) --}}
+                    {{-- SIDEBAR DROITE --}}
                     <div
-                        class="w-full md:w-[400px] bg-gray-900 p-10 text-white flex flex-col justify-between relative overflow-hidden">
-                        <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-600/20 blur-[60px] rounded-full"></div>
-
+                        class="w-full md:w-[340px] bg-gray-900 p-10 text-white flex flex-col justify-between relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-40 h-40 bg-indigo-600/20 blur-[80px] rounded-full"></div>
                         <div class="relative z-10 space-y-8">
-                            <div class="border-b border-white/10 pb-8">
-                                <label class="block text-[10px] font-black uppercase opacity-40 mb-3 tracking-widest">Loyer
-                                    HT / Mois</label>
-                                <div class="flex items-baseline space-x-2">
-                                    <input type="number" form="form-contrat" name="loyer_mensuel" id="input_loyer"
-                                        class="w-full bg-transparent border-none p-0 text-5xl font-black text-indigo-400 focus:ring-0"
-                                        placeholder="0" required>
-                                    <span class="text-xs font-bold opacity-30">FCFA</span>
+
+                            {{-- Récapitulatif --}}
+                            <div>
+                                <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-4">Récapitulatif
+                                    financier</p>
+                                <div class="space-y-4">
+                                    <div class="p-5 bg-white/5 rounded-2xl border border-white/10">
+                                        <p class="text-[9px] font-black text-gray-400 uppercase mb-1">Loyer mensuel</p>
+                                        <p class="text-3xl font-black text-indigo-400" id="recap-loyer">0 <span
+                                                class="text-sm">FCFA</span></p>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <div class="p-4 bg-white/5 rounded-2xl border border-white/10">
+                                            <p class="text-[8px] font-black text-gray-400 uppercase mb-1">Caution</p>
+                                            <p class="text-sm font-black text-white" id="recap-caution">0 FCFA</p>
+                                        </div>
+                                        <div class="p-4 bg-white/5 rounded-2xl border border-white/10">
+                                            <p class="text-[8px] font-black text-gray-400 uppercase mb-1">Frais agence</p>
+                                            <p class="text-sm font-black text-white" id="recap-agence">0 FCFA</p>
+                                        </div>
+                                    </div>
+                                    <div class="p-4 bg-indigo-600/20 rounded-2xl border border-indigo-500/30">
+                                        <p class="text-[8px] font-black text-indigo-300 uppercase mb-1">Total à encaisser
+                                            (1er mois)</p>
+                                        <p class="text-lg font-black text-indigo-300" id="recap-total">0 FCFA</p>
+                                    </div>
                                 </div>
                             </div>
 
-                            <div class="space-y-6 italic">
-                                <div>
-                                    <label
-                                        class="block text-[9px] font-black uppercase opacity-40 mb-2 tracking-widest">Caution</label>
-                                    <input type="number" form="form-contrat" name="caution" id="input_caution"
-                                        class="w-full bg-white/5 border-none rounded-2xl py-4 px-5 text-xl font-black text-white focus:ring-2 focus:ring-indigo-500"
-                                        required>
+                            {{-- Infos --}}
+                            <div class="space-y-3">
+                                <div class="p-4 bg-white/5 rounded-2xl border border-white/5 flex items-start gap-3">
+                                    <i class="fas fa-info-circle text-indigo-400 mt-0.5"></i>
+                                    <p class="text-[10px] font-bold text-gray-300 leading-relaxed uppercase tracking-wide">
+                                        Le numéro de contrat sera généré automatiquement.
+                                    </p>
                                 </div>
-                                <div>
-                                    <label
-                                        class="block text-[9px] font-black uppercase opacity-40 mb-2 tracking-widest">Frais
-                                        Agence</label>
-                                    <input type="number" form="form-contrat" name="frais_agence"
-                                        class="w-full bg-white/5 border-none rounded-2xl py-4 px-5 text-xl font-black text-white">
-                                </div>
-                                <div>
-                                    <label class="block text-[9px] font-black uppercase opacity-40 mb-1">Jour de paiement
-                                        (1-31)</label>
-                                    <input type="number" name="jour_paiement" value="{{ old('jour_paiement', 5) }}"
-                                        class="w-full bg-white/5 border-none rounded-xl py-3 px-4 text-xl font-bold">
-                                </div>
-                                <div class="pt-4 space-y-3">
-                                    <label
-                                        class="flex items-center space-x-3 cursor-pointer group p-3 rounded-2xl hover:bg-white/5 transition-all">
-                                        <input type="checkbox" form="form-contrat" name="renouvellement_automatique"
-                                            value="1"
-                                            class="w-5 h-5 rounded border-none bg-white/20 text-indigo-500 focus:ring-0">
-                                        <span class="text-[10px] font-black uppercase tracking-widest">Tacite
-                                            Reconduction</span>
-                                    </label>
+                                <div class="p-4 bg-white/5 rounded-2xl border border-white/5 flex items-start gap-3">
+                                    <i class="fas fa-file-pdf text-orange-400 mt-0.5"></i>
+                                    <p class="text-[10px] font-bold text-gray-300 leading-relaxed uppercase tracking-wide">
+                                        Un PDF du bail sera généré automatiquement.
+                                    </p>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="relative z-10 mt-10">
+                        {{-- Bouton --}}
+                        <div class="relative z-10 mt-8">
                             <button type="submit" form="form-contrat"
                                 class="w-full bg-indigo-600 hover:bg-indigo-500 py-6 rounded-[2rem] font-black text-xs uppercase tracking-[0.3em] shadow-2xl transition-all group">
-                                Créer le Bail <i
-                                    class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
+                                Créer le Bail
+                                <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
                             </button>
                         </div>
                     </div>
@@ -369,39 +506,52 @@
         </div>
     </div>
 
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const modal = document.getElementById('modal-contrat');
             const bienSelector = document.getElementById('bien_selector');
             const inputLoyer = document.getElementById('input_loyer');
             const inputCaution = document.getElementById('input_caution');
-            const inputAgence = document.querySelector('input[name="frais_agence"]');
+            const inputAgence = document.getElementById('input_agence');
 
-            // Gérer le changement de bien pour auto-remplir
+            function fmt(val) {
+                return new Intl.NumberFormat('fr-FR').format(val || 0) + ' FCFA';
+            }
+
+            function updateRecap() {
+                const loyer = parseFloat(inputLoyer.value) || 0;
+                const caution = parseFloat(inputCaution.value) || 0;
+                const agence = parseFloat(inputAgence.value) || 0;
+                const total = loyer + caution + agence;
+
+                document.getElementById('recap-loyer').innerHTML = fmt(loyer).replace(' FCFA', '') +
+                    ' <span class="text-sm">FCFA</span>';
+                document.getElementById('recap-caution').textContent = fmt(caution);
+                document.getElementById('recap-agence').textContent = fmt(agence);
+                document.getElementById('recap-total').textContent = fmt(total);
+            }
+
+            // Auto-remplissage depuis le bien sélectionné
             if (bienSelector) {
                 bienSelector.addEventListener('change', function() {
-                    const selected = this.options[this.selectedIndex];
-                    if (selected.value !== "") {
-                        const loyer = selected.getAttribute('data-loyer');
-                        const caution = selected.getAttribute('data-caution');
-
-                        inputLoyer.value = loyer || 0;
-                        inputCaution.value = caution || 0;
-                        if (inputAgence) inputAgence.value = loyer || 0;
-
-                        [inputLoyer, inputCaution].forEach(el => {
-                            el.style.transition = 'all 0.4s';
-                            el.style.color = '#818cf8';
-                            setTimeout(() => el.style.color = '', 500);
-                        });
+                    const opt = this.options[this.selectedIndex];
+                    if (opt.value) {
+                        inputLoyer.value = opt.getAttribute('data-loyer') || 0;
+                        inputCaution.value = opt.getAttribute('data-caution') || 0;
+                        updateRecap();
                     }
                 });
             }
 
-            // Fermer le modal avec Echap
+            // Mise à jour dynamique du recap
+            [inputLoyer, inputCaution, inputAgence].forEach(el => {
+                if (el) el.addEventListener('input', updateRecap);
+            });
+
+            // Fermer avec Echap
             document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
-                    modal.classList.add('hidden');
+                if (e.key === 'Escape') {
+                    document.getElementById('modal-contrat').classList.add('hidden');
                 }
             });
         });

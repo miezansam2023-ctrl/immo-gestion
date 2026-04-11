@@ -1,0 +1,20 @@
+:{$PORT} {
+    root * /app/public
+
+    encode gzip
+
+    php_fastcgi unix//run/php-fpm.sock
+
+    file_server
+
+    @dotfiles {
+        path /.*
+    }
+    respond @dotfiles 403
+
+    @hidden {
+        path /storage/*
+        path /bootstrap/cache/*
+    }
+    respond @hidden 403
+}

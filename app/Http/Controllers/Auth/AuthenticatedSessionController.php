@@ -28,8 +28,19 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        //  Rediriger selon le rôle
+        if (auth()->user()->role === 'admin') {
+            return redirect()->route('admin.dashboard')
+                ->with('success', 'Bienvenue Admin !');
+        }
+
+        // Gestionnaire → dashboard normal
+        return redirect()->intended(route('dashboard', absolute: false))
+            ->with('success', 'Bienvenue, ' . Auth::user()->role . ' ' . Auth::user()->nom . ' ' . Auth::user()->prenoms . '. Vous etes connecté(e)  !');
+
+
         // return redirect()->intended(route('dashboard', absolute: false))->with('success', "Bienvenue , vous etes connecté(e) !");
-        return redirect()->intended(route('dashboard', absolute: false))->with('success', 'Bienvenue, '. Auth::user()->role . ' ' . Auth::user()->nom . ' ' . Auth::user()->prenoms . '. Vous etes connecté(e)  !');
+        
     }
 
     /**

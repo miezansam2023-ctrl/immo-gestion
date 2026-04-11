@@ -15,15 +15,16 @@ class BienController extends Controller
     public function index(Request $request)
     {
         // On récupère uniquement les biens liés au gestionnaire (via la relation dans le model User)
-        $biens = auth()->user()->biens()->latest()->paginate(12);
+        $biens = auth()->user()->biens()->latest()->paginate(10);
 
         // On récupère le terme de recherche
         $search = $request->input('search');
+        $statut = $request->input('statut');
 
         // Requête de base : uniquement les biens de l'utilisateur connecté
         $query = auth()->user()->biens();
 
-        // Application du filtre si une recherche est lancée
+        // Application du filtre de recherche textuelle
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('titre', 'like', "%{$search}%")
@@ -35,19 +36,16 @@ class BienController extends Controller
             });
         }
 
+        // Application du filtre par statut
+        if ($statut && $statut !== 'tous') {
+            $query->where('statut', $statut);
+        }
+
         // Récupération des données paginées (on garde le paginate pour la performance)
-        $biens = $query->latest()->paginate(12)->withQueryString();
+        $biens = $query->latest()->paginate(10)->withQueryString();
 
         
         return view('biens.index', compact('biens'));
-    }
-
-    /**
-     * Affiche le formulaire de création.
-     */
-    public function create()
-    {
-        return view('biens.create'); // Corrigé : doit pointer vers la vue de création
     }
 
     /**
@@ -117,19 +115,6 @@ class BienController extends Controller
 
         return redirect()->route('biens.index')->with('success', "Le bien {$bien->reference} a été créé avec succès !");
     }
-
-    /**
-     * Affiche les détails d'un bien.
-     */
-    // public function show(Bien $bien)
-    // {
-    //     // Sécurité : Vérifier que le bien appartient au gestionnaire
-    //     if ($bien->gestionnaire_id !== auth()->id()) {
-    //         abort(403, 'Accès non autorisé.');
-    //     }
-
-    //     return view('biens.show', compact('bien'));
-    // }
 
     public function edit($id)
     {
