@@ -3,7 +3,7 @@
 
     encode gzip
 
-    php_fastcgi unix//run/php-fpm.sock
+    php_fastcgi 127.0.0.1:9000
 
     file_server
 
@@ -11,10 +11,4 @@
         path /.*
     }
     respond @dotfiles 403
-
-    @hidden {
-        path /storage/*
-        path /bootstrap/cache/*
-    }
-    respond @hidden 403
 }
