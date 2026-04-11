@@ -145,7 +145,7 @@ class AdminController extends Controller
 
         $user->delete();
 
-        return back()->with('success', "Le compte de {$user->nom} {$user->prenoms} a été supprimé définitivement.");
+        return redirect()->route('admin.gestionnaires')->with('success', "Le compte de {$user->nom} {$user->prenoms} a été supprimé définitivement.");
     }
  
     // ─── Stats globales ──────────────────────────────
