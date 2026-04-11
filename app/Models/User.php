@@ -17,11 +17,11 @@ class User extends Authenticatable
         'email',
         'telephone',
         'password',
-        // 'role',
-        // 'actif',
-        // 'deactivated_at',
-        // 'deactivated_by',
-        // 'last_login',
+        'role',
+        'actif',
+        'deactivated_at',
+        'deactivated_by',
+        'last_login',
     ];
 
     protected $hidden = [
