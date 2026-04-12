@@ -16,10 +16,10 @@ class AdminController extends Controller
     public function index()
     {
         $stats = [
-            'total_gestionnaires' => User::where('role', 'gestionnaire')->count(),
-            'gestionnaires_actifs' => User::where('role', 'gestionnaire')
+            'total_utilisateurs' => User::where('role', ['admin','gestionnaire'])->count(),
+            'utilisateurs_actifs' => User::where('role', ['admin','gestionnaire'])
                                          ->where('actif', true)->count(),
-            'gestionnaires_inactifs' => User::where('role', 'gestionnaire')
+            'utilisateurs_inactifs' => User::where('role', ['admin','gestionnaire'])
                                            ->where('actif', false)->count(),
             'total_biens'      => Bien::count(),
             'total_contrats'   => Contrat::count(),

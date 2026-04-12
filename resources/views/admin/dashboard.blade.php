@@ -31,10 +31,10 @@
             <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">
                 Comptes utilisateurs</p>
             <p class="text-4xl font-black text-[#1E293B]">
-                {{ $stats['total_gestionnaires'] }}</p>
+                {{ $stats['total_utilisateurs'] }}</p>
             <p class="text-[10px] text-emerald-500 font-bold mt-2">
-                {{ $stats['gestionnaires_actifs'] }} actifs ·
-                {{ $stats['gestionnaires_inactifs'] }} inactifs
+                {{ $stats['utilisateurs_actifs'] }} actifs ·
+                {{ $stats['utilisateurs_inactifs'] }} inactifs
             </p>
         </div>
         <div class="bg-[#1E293B] rounded-[2rem] p-6 shadow-xl">
