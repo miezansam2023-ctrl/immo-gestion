@@ -28,6 +28,9 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        // Mise à jour last_login pour TOUS les rôles
+        auth()->user()->update(['last_login' => now()]);
+
         //  Rediriger selon le rôle
         if (auth()->user()->role === 'admin') {
             return redirect()->route('admin.dashboard')
@@ -40,7 +43,7 @@ class AuthenticatedSessionController extends Controller
 
 
         // return redirect()->intended(route('dashboard', absolute: false))->with('success', "Bienvenue , vous etes connecté(e) !");
-        
+
     }
 
     /**

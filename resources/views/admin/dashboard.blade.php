@@ -88,7 +88,7 @@
                     </div>
                     <div>
                         <p class="font-black text-[#1E293B] text-sm uppercase">
-                            {{ $g->nom }} {{ $g->prenoms }}</p>
+                            {{ $g->prenoms }} {{ $g->nom }} </p>
                         <p class="text-[10px] text-gray-400">{{ $g->email }}</p>
                     </div>
                 </div>

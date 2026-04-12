@@ -1,7 +1,7 @@
 <?php
- 
+
 namespace App\Http\Controllers\Admin;
- 
+
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Bien;
@@ -9,32 +9,35 @@ use App\Models\Contrat;
 use App\Models\Paiement;
 use App\Models\Locataire;
 use Illuminate\Http\Request;
- 
+
 class AdminController extends Controller
 {
     // ─── Dashboard Admin ────────────────────────────
     public function index()
     {
         $stats = [
-            'total_utilisateurs' => User::where('role', ['admin','gestionnaire'])->count(),
-            'utilisateurs_actifs' => User::where('role', ['admin','gestionnaire'])
-                                         ->where('actif', true)->count(),
-            'utilisateurs_inactifs' => User::where('role', ['admin','gestionnaire'])
-                                           ->where('actif', false)->count(),
-            'total_biens'      => Bien::count(),
-            'total_contrats'   => Contrat::count(),
-            'total_locataires' => Locataire::count(),
-            'total_paiements'  => Paiement::where('statut', 'paye')->sum('montant_paye'),
-            'contrats_actifs'  => Contrat::where('statut', 'actif')->count(),
+            'total_utilisateurs'    => User::whereIn('role', ['admin', 'gestionnaire'])->count(),
+            'utilisateurs_actifs'   => User::whereIn('role', ['admin', 'gestionnaire'])
+                ->where('actif', true)->count(),
+            'utilisateurs_inactifs' => User::whereIn('role', ['admin', 'gestionnaire'])
+                ->where('actif', false)->count(),
+            'total_biens'           => Bien::count(),
+            'total_contrats'        => Contrat::count(),
+            'total_locataires'      => Locataire::count(),
+            'total_paiements'       => Paiement::where('statut', 'paye')->sum('montant_paye'),
+            'contrats_actifs'       => Contrat::where('statut', 'actif')->count(),
         ];
- 
-        // Les 5 derniers utilisateurs inscrits
-        $derniersUtilisateurs = User::where('role', ['admin', 'gestionnaire'])
-            ->latest()->take(5)->get();
- 
+
+        // Les 5 derniers comptes créés (admins + gestionnaires, sans l'admin principal id=1)
+        $derniersUtilisateurs = User::whereIn('role', ['admin', 'gestionnaire'])
+            ->where('id', '!=', 1)
+            ->latest()
+            ->take(5)
+            ->get();
+
         return view('admin.dashboard', compact('stats', 'derniersUtilisateurs'));
     }
- 
+
     // ─── Liste des utilisateurs ─────────────────────
     public function utilisateurs(Request $request)
     {
@@ -55,7 +58,7 @@ class AdminController extends Controller
 
         return view('admin.utilisateurs', compact('utilisateurs'));
     }
- 
+
     // ─── Détail d'un utilisateur ────────────────────
     public function showUtilisateur(User $user)
     {
@@ -71,7 +74,7 @@ class AdminController extends Controller
         ];
         return view('admin.utilisateur-show', compact('user', 'stats'));
     }
- 
+
     // ─── Activer / Désactiver ────────────────────────
     public function toggleActif(User $user)
     {
@@ -98,8 +101,10 @@ class AdminController extends Controller
             $status = 'activé';
         }
 
-        return back()->with('success',
-            "Le compte de {$user->nom} {$user->prenoms} a été {$status}.");
+        return back()->with(
+            'success',
+            "Le compte de {$user->nom} {$user->prenoms} a été {$status}."
+        );
     }
 
     // ─── Changer le rôle ─────────────────────────────
@@ -123,8 +128,10 @@ class AdminController extends Controller
         $user->update(['role' => $nouveauRole]);
 
         $action = $nouveauRole === 'admin' ? 'promu admin' : 'rétrogradé gestionnaire';
-        return back()->with('success',
-            "Le compte de {$user->nom} {$user->prenoms} a été {$action}.");
+        return back()->with(
+            'success',
+            "Le compte de {$user->nom} {$user->prenoms} a été {$action}."
+        );
     }
 
     // ─── Supprimer un gestionnaire ───────────────────
@@ -147,18 +154,18 @@ class AdminController extends Controller
 
         return redirect()->route('admin.utilisateurs')->with('success', "Le compte de {$user->nom} {$user->prenoms} a été supprimé.");
     }
- 
+
     // ─── Stats globales ──────────────────────────────
     public function stats()
     {
         $statsParGestionnaire = User::where('role', 'gestionnaire')
             ->withCount(['biens', 'contrats', 'locataires'])
-            ->withSum(['paiements' => function($q) {
+            ->withSum(['paiements' => function ($q) {
                 $q->where('statut', 'paye');
             }], 'montant_paye')
             ->orderByDesc('paiements_sum_montant_paye')
             ->get();
- 
+
         return view('admin.stats', compact('statsParGestionnaire'));
     }
 }

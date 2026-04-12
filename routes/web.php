@@ -22,13 +22,14 @@ Route::get('/', function () {
 })->name('home');
 
 // Routes d'administration, protégées par les middlewares 'auth' et 'admin'
+
 // ─── ROUTES ADMIN ──────────────────────────────────────
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
 
     // Dashboard admin
     Route::get('/', [AdminController::class, 'index'])->name('dashboard');
 
-    // Liste des gestionnaires
+    // Liste des utilisateurs (gestionnaires + admins, sans l'admin principal id=1)
     Route::get('/utilisateurs', [AdminController::class, 'utilisateurs'])
         ->name('utilisateurs');
 
@@ -36,7 +37,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/utilisateurs/{user}', [AdminController::class, 'showUtilisateur'])
         ->name('utilisateurs.show');
 
-    // Activer / Désactiver un compte
+    // Activer / Désactiver un compte utilisateur
     Route::patch('/utilisateurs/{user}/toggle', [AdminController::class, 'toggleActif'])
         ->name('utilisateurs.toggle');
 

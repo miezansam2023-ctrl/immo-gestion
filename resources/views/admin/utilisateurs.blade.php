@@ -100,8 +100,8 @@
                                     @if(!$g->actif && $g->deactivated_at)
                                         <p class="text-[9px] text-gray-500 mt-1">
                                             Désactivé le {{ $g->deactivated_at->format('d/m/Y H:i') }}
-                                            @if($g->deactivatedBy)
-                                                par {{ $g->deactivatedBy->nom }} {{ $g->deactivatedBy->prenoms }}
+                                            @if($g->deactivatedBy) 
+                                            par {{ $g->deactivatedBy->prenoms }} {{ $g->deactivatedBy->nom }} 
                                             @endif
                                         </p>
                                     @endif

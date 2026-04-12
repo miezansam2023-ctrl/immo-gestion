@@ -98,7 +98,7 @@
                             <p class="text-xs text-red-500 mt-1">
                                 Désactivé le {{ $user->deactivated_at->format('d/m/Y à H:i') }}
                                 @if($user->deactivatedBy)
-                                    par {{ $user->deactivatedBy->nom }} {{ $user->deactivatedBy->prenoms }}
+                                    par {{ $user->deactivatedBy->prenoms }} {{ $user->deactivatedBy->nom }} 
                                 @endif
                             </p>
                         @endif
