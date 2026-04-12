@@ -29,24 +29,24 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/', [AdminController::class, 'index'])->name('dashboard');
 
     // Liste des gestionnaires
-    Route::get('/gestionnaires', [AdminController::class, 'gestionnaires'])
-        ->name('gestionnaires');
+    Route::get('/utilisateurs', [AdminController::class, 'utilisateurs'])
+        ->name('utilisateurs');
 
-    // Voir les détails d'un gestionnaire
-    Route::get('/gestionnaires/{user}', [AdminController::class, 'showGestionnaire'])
-        ->name('gestionnaires.show');
+    // Voir les détails d'un utilisateur
+    Route::get('/utilisateurs/{user}', [AdminController::class, 'showUtilisateur'])
+        ->name('utilisateurs.show');
 
     // Activer / Désactiver un compte
-    Route::patch('/gestionnaires/{user}/toggle', [AdminController::class, 'toggleActif'])
-        ->name('gestionnaires.toggle');
+    Route::patch('/utilisateurs/{user}/toggle', [AdminController::class, 'toggleActif'])
+        ->name('utilisateurs.toggle');
 
     // Changer le rôle (gestionnaire ↔ admin)
-    Route::patch('/gestionnaires/{user}/change-role', [AdminController::class, 'changeRole'])
-        ->name('gestionnaires.changeRole');
+    Route::patch('/utilisateurs/{user}/change-role', [AdminController::class, 'changeRole'])
+        ->name('utilisateurs.changeRole');
 
-    // Supprimer un gestionnaire
-    Route::delete('/gestionnaires/{user}', [AdminController::class, 'destroyGestionnaire'])
-        ->name('gestionnaires.destroy');
+    // Supprimer un compte utilisateur 
+    Route::delete('/utilisateurs/{user}', [AdminController::class, 'destroyUtilisateur'])
+        ->name('utilisateurs.destroy');
 
     // Stats globales
     Route::get('/stats', [AdminController::class, 'stats'])->name('stats');

@@ -14,10 +14,10 @@
                 Dashboard Admin
             </h1>
         </div>
-        <a href="{{ route('admin.gestionnaires') }}"
+        <a href="{{ route('admin.utilisateurs') }}"
            class="px-6 py-3 bg-[#1E293B] text-white rounded-2xl text-[10px] font-black
                   uppercase tracking-widest hover:bg-indigo-600 transition-all">
-            <i class="fas fa-users mr-2"></i> Gérer les comptes
+            <i class="fas fa-users mr-2"></i> Gérer les comptes utilisateurs
         </a>
     </div>
  
@@ -29,7 +29,7 @@
                 <i class="fas fa-users"></i>
             </div>
             <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                Gestionnaires</p>
+                Comptes utilisateurs</p>
             <p class="text-4xl font-black text-[#1E293B]">
                 {{ $stats['total_gestionnaires'] }}</p>
             <p class="text-[10px] text-emerald-500 font-bold mt-2">
@@ -74,12 +74,12 @@
         <div class="px-8 py-6 border-b border-gray-50 flex justify-between items-center">
             <h3 class="font-black text-[#1E293B] uppercase tracking-tight">
                 Derniers comptes créés</h3>
-            <a href="{{ route('admin.gestionnaires') }}"
+            <a href="{{ route('admin.utilisateurs') }}"
                class="text-[10px] font-black text-indigo-600 uppercase tracking-widest
                       hover:text-indigo-800">Tout voir →</a>
         </div>
         <div class="divide-y divide-gray-50">
-            @forelse($derniersGestionnaires as $g)
+            @forelse($derniersUtilisateurs as $g)
             <div class="px-8 py-5 flex items-center justify-between hover:bg-gray-50/50">
                 <div class="flex items-center gap-4">
                     <div class="w-10 h-10 rounded-2xl bg-indigo-50 flex items-center justify-center
@@ -97,7 +97,7 @@
                         {{ $g->actif ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600' }}">
                         {{ $g->actif ? 'Actif' : 'Inactif' }}
                     </span>
-                    <a href="{{ route('admin.gestionnaires.show', $g) }}"
+                    <a href="{{ route('admin.utilisateurs.show', $g) }}"
                        class="p-2 bg-gray-50 text-gray-400 rounded-xl hover:bg-emerald-600
                               hover:text-white transition-all">
                         <i class="fas fa-eye text-xs"></i>
@@ -105,7 +105,7 @@
                 </div>
             </div>
             @empty
-            <p class="px-8 py-10 text-center text-gray-400 italic">Aucun gestionnaire.</p>
+            <p class="px-8 py-10 text-center text-gray-400 italic">Aucun utilisateur.</p>
             @endforelse
         </div>
     </div>

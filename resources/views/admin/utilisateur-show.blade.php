@@ -14,7 +14,7 @@
             <p class="text-sm text-gray-500 mt-1">{{ $user->email }}</p>
         </div>
         <div class="flex items-center gap-3">
-            <a href="{{ route('admin.gestionnaires') }}"
+            <a href="{{ route('admin.utilisateurs') }}"
                class="px-5 py-3 bg-white border border-gray-200 text-[#1E293B] rounded-2xl
                       text-[10px] font-black uppercase tracking-widest hover:border-indigo-400
                       hover:text-indigo-600 transition-all">
@@ -24,7 +24,7 @@
             {{-- Actions disponibles seulement si ce n'est pas le premier admin --}}
             @if($user->id !== 1)
                 {{-- Changer le rôle --}}
-                <form method="POST" action="{{ route('admin.gestionnaires.changeRole', $user) }}">
+                <form method="POST" action="{{ route('admin.utilisateurs.changeRole', $user) }}">
                     @csrf @method('PATCH')
                     <button type="submit"
                         class="px-5 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-2xl
@@ -34,7 +34,7 @@
                     </button>
                 </form>
                 {{-- Toggle actif --}}
-                <form method="POST" action="{{ route('admin.gestionnaires.toggle', $user) }}">
+                <form method="POST" action="{{ route('admin.utilisateurs.toggle', $user) }}">
                     @csrf @method('PATCH')
                     <button type="submit"
                         class="px-5 py-3 {{ $user->actif ? 'bg-orange-500 hover:bg-orange-600' : 'bg-emerald-500 hover:bg-emerald-600' }}
@@ -45,7 +45,7 @@
                     </button>
                 </form>
                 {{-- Supprimer --}}
-                <form method="POST" action="{{ route('admin.gestionnaires.destroy', $user) }}"
+                <form method="POST" action="{{ route('admin.utilisateurs.destroy', $user) }}"
                       onsubmit="event.preventDefault(); confirmDelete('Supprimer définitivement ce compte ?').then(confirmed => { if(confirmed) this.submit(); })">
                     @csrf @method('DELETE')
                     <button type="submit"

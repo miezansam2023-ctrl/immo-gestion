@@ -8,7 +8,7 @@
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
                 <p class="text-[10px] font-black text-red-500 uppercase tracking-[0.3em] mb-1">🛡️ Admin</p>
-                <h1 class="text-3xl md:text-4xl font-black text-[#1E293B] uppercase tracking-tight">Gestion des comptes</h1>
+                <h1 class="text-3xl md:text-4xl font-black text-[#1E293B] uppercase tracking-tight">Gestion des comptes utilisateurs</h1>
                 <p class="text-sm text-gray-500 mt-2">Visualisez et gérez tous les comptes (admins et gestionnaires). Sélectionnez un utilisateur pour actions rapides.</p>
             </div>
             <a href="{{ route('admin.dashboard') }}" class="whitespace-nowrap px-5 py-3 bg-[#1E293B] text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-600 transition-all">
@@ -37,7 +37,7 @@
                             </tr>
                         </thead>
                     <tbody class="divide-y divide-gray-50">
-                        @forelse($gestionnaires as $g)
+                        @forelse($utilisateurs as $g)
                             <tr class="group hover:bg-indigo-50/20 transition-all">
                                 <td class="p-6">
                                     <div class="flex items-center gap-3">
@@ -109,7 +109,7 @@
                                 <td class="p-6">
                                     <div class="flex items-center justify-end gap-2">
                                         {{-- Voir --}}
-                                        <a href="{{ route('admin.gestionnaires.show', $g) }}"
+                                        <a href="{{ route('admin.utilisateurs.show', $g) }}"
                                             class="p-2 bg-gray-50 text-gray-400 rounded-xl hover:bg-emerald-600
                                       hover:text-white transition-all">
                                             <i class="fas fa-eye text-xs"></i>
@@ -118,7 +118,7 @@
                                         {{-- Actions disponibles seulement si ce n'est pas le premier admin --}}
                                         @if($g->id !== 1)
                                             {{-- Toggle actif --}}
-                                            <form method="POST" action="{{ route('admin.gestionnaires.toggle', $g) }}" onsubmit="event.preventDefault(); confirmToggle('{{ $g->actif ? 'desactiver' : 'activer' }}', '{{ addslashes($g->nom . ' ' . $g->prenoms) }}', this);">
+                                            <form method="POST" action="{{ route('admin.utilisateurs.toggle', $g) }}" onsubmit="event.preventDefault(); confirmToggle('{{ $g->actif ? 'desactiver' : 'activer' }}', '{{ addslashes($g->nom . ' ' . $g->prenoms) }}', this);">
                                                 @csrf @method('PATCH')
                                                 <button type="submit"
                                                     class="p-2 bg-gray-50 text-gray-400 rounded-xl transition-all
@@ -129,7 +129,7 @@
                                                 </button>
                                             </form>
                                             {{-- Changer le rôle --}}
-                                            <form method="POST" action="{{ route('admin.gestionnaires.changeRole', $g) }}"
+                                            <form method="POST" action="{{ route('admin.utilisateurs.changeRole', $g) }}"
                                                 onsubmit="event.preventDefault(); const msg = '{{ $g->role === 'gestionnaire' ? 'Promouvoir ce gestionnaire en admin ?' : 'Rétrograder cet admin en gestionnaire ?' }}'; confirmDelete(msg).then(confirmed => { if(confirmed) this.submit(); })">
                                                 @csrf @method('PATCH')
                                                 <button type="submit"
@@ -139,8 +139,8 @@
                                                 </button>
                                             </form>
                                             {{-- Supprimer --}}
-                                            <form method="POST" action="{{ route('admin.gestionnaires.destroy', $g) }}"
-                                                onsubmit="event.preventDefault(); confirmDelete('Supprimer définitivement ce compte ?').then(confirmed => { if(confirmed) this.submit(); })">
+                                            <form method="POST" action="{{ route('admin.utilisateurs.destroy', $g) }}"
+                                                onsubmit="event.preventDefault(); confirmDelete('Supprimer ce compte ?').then(confirmed => { if(confirmed) this.submit(); })">
                                                 @csrf @method('DELETE')
                                                 <button type="submit"
                                                     class="p-2 bg-gray-50 text-gray-300 rounded-xl hover:bg-red-600
@@ -168,7 +168,7 @@
                     </tbody>
                 </table>
                 </div>
-                <div class="p-6 bg-gray-50/50">{{ $gestionnaires->links() }}</div>
+                <div class="p-6 bg-gray-50/50">{{ $utilisateurs->links() }}</div>
             </div>
 
         </div>

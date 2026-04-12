@@ -86,16 +86,33 @@
             </label>
         </div>
 
-        <div class="pt-4">
+        <div class="pt-6 space-y-4">
+            
             <button type="submit"
-                class="w-full bg-gray-900 hover:bg-black text-white py-5 rounded-2xl font-black text-sm uppercase tracking-[0.2em] shadow-xl hover:shadow-indigo-200 transition-all transform hover:-translate-y-1 active:scale-95">
-                Se connecter 
+                class="w-full bg-gray-900 hover:bg-black text-white py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl transition-all active:scale-95">
+                Se connecter
             </button>
-        </div>
 
-        <p class="text-center text-[10px] font-bold text-gray-400 uppercase tracking-widest pt-6">
+            <div class="text-center">
+
+                <div class="text-center">
+                    <a class="text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-indigo-600 transition-colors"
+                        href="{{ route('register') }}">
+                        Pas encore inscrit ? S'inscrire
+                    </a>
+                </div>
+
+                <a class="text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-indigo-600 transition-colors"
+                    href="{{ route('home') }}">
+                    retour à l'accueil
+                </a>
+
+            </div>
+
+            {{-- <p class="text-center text-[10px] font-bold text-gray-400 uppercase tracking-widest pt-6">
             Système de Gestion immobiliere pour les professionnels de l'immobilier.
-        </p>
+        </p> --}}
+
     </form>
 
 </x-guest-layout>

@@ -28,15 +28,15 @@ class AdminController extends Controller
             'contrats_actifs'  => Contrat::where('statut', 'actif')->count(),
         ];
  
-        // Les 5 derniers gestionnaires inscrits
-        $derniersGestionnaires = User::where('role', 'gestionnaire')
+        // Les 5 derniers utilisateurs inscrits
+        $derniersUtilisateurs = User::where('role', ['admin', 'gestionnaire'])
             ->latest()->take(5)->get();
  
-        return view('admin.dashboard', compact('stats', 'derniersGestionnaires'));
+        return view('admin.dashboard', compact('stats', 'derniersUtilisateurs'));
     }
  
-    // ─── Liste des gestionnaires ─────────────────────
-    public function gestionnaires(Request $request)
+    // ─── Liste des utilisateurs ─────────────────────
+    public function utilisateurs(Request $request)
     {
         $search = $request->input('search');
 
@@ -49,15 +49,15 @@ class AdminController extends Controller
             $query->where('id', '!=', auth()->id());
         }
 
-        $gestionnaires = $query->latest()
+        $utilisateurs = $query->latest()
             ->paginate(10)
             ->withQueryString();
 
-        return view('admin.gestionnaires', compact('gestionnaires'));
+        return view('admin.utilisateurs', compact('utilisateurs'));
     }
  
-    // ─── Détail d'un gestionnaire ────────────────────
-    public function showGestionnaire(User $user)
+    // ─── Détail d'un utilisateur ────────────────────
+    public function showUtilisateur(User $user)
     {
         $user->load(['biens', 'contrats', 'locataires']);
         $stats = [
@@ -69,7 +69,7 @@ class AdminController extends Controller
             'revenus_total'    => $user->paiements()->where('statut', 'paye')->sum('montant_paye'),
 
         ];
-        return view('admin.gestionnaire-show', compact('user', 'stats'));
+        return view('admin.utilisateur-show', compact('user', 'stats'));
     }
  
     // ─── Activer / Désactiver ────────────────────────
@@ -128,7 +128,7 @@ class AdminController extends Controller
     }
 
     // ─── Supprimer un gestionnaire ───────────────────
-    public function destroyGestionnaire(User $user)
+    public function destroyUtilisateur(User $user)
     {
         // Sécurité : empêcher de supprimer le premier admin
         if ($user->id === 1) {
@@ -145,7 +145,7 @@ class AdminController extends Controller
 
         $user->delete();
 
-        return redirect()->route('admin.gestionnaires')->with('success', "Le compte de {$user->nom} {$user->prenoms} a été supprimé définitivement.");
+        return redirect()->route('admin.utilisateurs')->with('success', "Le compte de {$user->nom} {$user->prenoms} a été supprimé.");
     }
  
     // ─── Stats globales ──────────────────────────────
