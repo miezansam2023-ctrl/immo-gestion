@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 230 230" width="230" height="230">
+
+  <!-- Fond -->
+  <rect x="0" y="0" width="230" height="230" rx="52" fill="#1E293B"/>
+
+  <!-- Toit -->
+  <polygon points="115,14 203,62 27,62" fill="#6366f1"/>
+  <line x1="27" y1="62" x2="203" y2="62" stroke="#818cf8" stroke-width="1.5" stroke-linecap="round"/>
+  <circle cx="115" cy="14" r="4" fill="#818cf8"/>
+
+  <!-- Lettre I -->
+  <rect x="41" y="72" width="32" height="8" rx="4" fill="#6366f1"/>
+  <rect x="53" y="78" width="8" height="68" rx="4" fill="white"/>
+  <rect x="41" y="144" width="32" height="8" rx="4" fill="#6366f1"/>
+
+  <!-- Lettre G -->
+  <path d="M 177,84 A 42,42 0 1,0 177,160" fill="none" stroke="white" stroke-width="8" stroke-linecap="round"/>
+  <rect x="135" y="118" width="42" height="8" rx="4" fill="white"/>
+  <rect x="169" y="118" width="8" height="42" rx="4" fill="white"/>
+
+  <!-- Clé (badge bas-droite) -->
+  <circle cx="175" cy="176" r="26" fill="#1E293B"/>
+  <circle cx="175" cy="176" r="22" fill="#6366f1"/>
+  <circle cx="171" cy="174" r="10" fill="none" stroke="#1E293B" stroke-width="4.5"/>
+  <circle cx="171" cy="174" r="5"  fill="#6366f1"/>
+  <rect x="179" y="172" width="22" height="7" rx="3.5" fill="#1E293B"/>
+  <rect x="193" y="179" width="5" height="6" rx="2" fill="#1E293B"/>
+  <rect x="186" y="179" width="5" height="6" rx="2" fill="#1E293B"/>
+
+</svg>
